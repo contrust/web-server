@@ -11,5 +11,14 @@ class Server:
         server_socket.listen()
         while 1:
             client_socket, client_address = server_socket.accept()
-            print(client_address)
+            print(self.total_socket_recv(client_socket))
+
+    def total_socket_recv(self, client):
+        total_data = []
+        chunk = client.recv(8192)
+        while len(chunk):
+            total_data.append(chunk)
+            chunk = client.recv(8192)
+        return b''.join(total_data)
+
 
