@@ -1,3 +1,4 @@
 class Config:
     host: str = ''
-    port: int = 9090
+    port: int = 9998
+    max_processes: int = 1
