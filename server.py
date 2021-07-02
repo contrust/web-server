@@ -1,5 +1,8 @@
 from config import Config
 from socket import socket, AF_INET, SOCK_STREAM
+import concurrent.futures
+import errno
+from request import Request
 
 
 class Server:
@@ -11,14 +14,20 @@ class Server:
         server_socket.listen()
         while 1:
             client_socket, client_address = server_socket.accept()
-            print(self.total_socket_recv(client_socket))
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                future = executor.submit(self.get_all_client_data, client_socket)
+                return_value = future.result()
+                print(Request(return_value).body)
 
-    def total_socket_recv(self, client):
+    @staticmethod
+    def get_all_client_data(client: socket):
+        client.setblocking(False)
         total_data = []
-        chunk = client.recv(8192)
-        while len(chunk):
-            total_data.append(chunk)
-            chunk = client.recv(8192)
+        while 1:
+            try:
+                data = client.recv(8192)
+                total_data.append(data)
+            except IOError as e:
+                if e.errno == errno.EWOULDBLOCK:
+                    break
         return b''.join(total_data)
-
-
