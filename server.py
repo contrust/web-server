@@ -1,3 +1,5 @@
+import threading
+
 from config import Config
 from socket import socket, AF_INET, SOCK_STREAM
 import concurrent.futures
@@ -16,4 +18,5 @@ class Server:
                     print('chtozh...')
                     client, address = server.accept()
                     print(address, 'connected')
-                    executor.submit(ProxyPasser(client, self.config.proxy_host, self.config.proxy_port).run)
+                    print(f'{threading.activeCount()} threads are active')
+                    executor.submit(ProxyPasser(client).run)

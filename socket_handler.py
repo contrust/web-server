@@ -18,7 +18,7 @@ class SocketHandler:
             try:
                 data = self.socket.recv(8192)
                 total_data.append(data)
-                if data:
+                if not data:
                     break
             except Exception as e:
                 if e.errno == errno.EWOULDBLOCK:
