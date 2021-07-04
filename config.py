@@ -7,5 +7,5 @@ class Config:
     connection_timeout: float = 1
     max_threads: int = 5
     proxy_pass: dict[str, str] = {
-        '/location/': 'http://www.google.com/suka'
+        '/location/': 'http://www.google.com/suka/'
     }
