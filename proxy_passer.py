@@ -32,13 +32,13 @@ class ProxyPasser:
         print(data)
         request = Request(data)
         for location in self.config.proxy_pass:
-            if location.encode('utf-8') == request.uri[:len(location)]:
+            if location == request.uri[:len(location)]:
                 domain = self.config.proxy_pass[location].split('/')[2]
                 print('domain created')
                 self.host, self.port = pair[0] if len(pair := domain.split(':', maxsplit=1)) == 2 else pair[0], 80
                 self.port = int(self.port)
                 print('host and port are done')
-                request.uri = request.uri.replace(location.encode('utf-8'), self.config.proxy_pass[location].encode('utf-8'), 1)
+                request.uri = request.uri.replace(location, self.config.proxy_pass[location], 1)
                 print('uri is done')
                 return request.to_bytes()
         return b''
