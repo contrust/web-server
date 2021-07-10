@@ -10,3 +10,5 @@ class Config:
     root: str = 'root'
     auto_index: bool = True
     index: str = 'index.html'
+    file_cache_size: int = 5
+    file_cache_inactive_time: int = 60

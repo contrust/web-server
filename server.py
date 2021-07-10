@@ -19,4 +19,4 @@ class Server:
                     client, address = server.accept()
                     print(address, 'connected')
                     print(f'{threading.activeCount()} threads are active')
-                    executor.submit(Client(client).run)
+                    executor.submit(Client(client, server).run)
