@@ -12,8 +12,8 @@ class TimedLruCacheEntry:
 class TimedLruCache:
     config = Config()
 
-    def __init__(self, maxsize=config.file_cache_size,
-                 expiration_time=config.file_cache_inactive_time):
+    def __init__(self, maxsize=config.open_file_cache_size,
+                 expiration_time=config.open_file_cache_inactive_time):
         self.entries = {}
         self.maxsize = maxsize
         self.expiration_time = expiration_time

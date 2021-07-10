@@ -4,10 +4,12 @@ from config import Config
 from socket import socket, AF_INET, SOCK_STREAM
 import concurrent.futures
 from client import Client
+from file_handler import FileHandler
 
 
 class Server:
     config = Config()
+    file_handler = FileHandler()
 
     def start(self):
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.config.max_threads) as executor:
@@ -19,4 +21,4 @@ class Server:
                     client, address = server.accept()
                     print(address, 'connected')
                     print(f'{threading.activeCount()} threads are active')
-                    executor.submit(Client(client, server).run)
+                    executor.submit(Client(client, self.file_handler).run)
