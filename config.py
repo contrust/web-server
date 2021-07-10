@@ -1,8 +1,12 @@
 class Config:
     host: str = ''
-    port: int = 8080
-    connection_timeout: float = 1
+    port: int = 6444
+    connection_timeout: float = 5
     max_threads: int = 5
     proxy_pass: dict[str, str] = {
-        '/': 'http://www.google.com/server/'
+        '/puck/': 'localhost:8085/hi/',
+        '/da/': 'localhost:8085/'
     }
+    root: str = 'root'
+    auto_index: bool = True
+    index: str = 'index.html'
