@@ -2,15 +2,15 @@ from socket import socket, AF_INET, SOCK_STREAM
 from socket_handler import SocketHandler
 from request import Request
 from config import Config
-from server import Server
+from file_handler import FileHandler
 
 
 class Client:
     config = Config()
 
-    def __init__(self, client: socket, server: Server):
+    def __init__(self, client: socket, file_handler: FileHandler):
         self.client = client
-        self.server = server
+        self.file_handler = file_handler
 
     def run(self) -> None:
         client_handler = SocketHandler(self.client)
@@ -29,6 +29,6 @@ class Client:
                         client_request.headers['Connection'] != 'keep-alive'):
                     break
         else:
-            with open(self.config.root + '/' + client_request.uri + ('/' + self.config.index if self.config.auto_index else ''), mode='rb') as file:
-                client_handler.write(b'HTTP/1.1 200 Good\r\nServer: PythonHTTPServer/0.1b\r\nContent-Length: 6\r\n\r\n' + file.read())
+            client_handler.write(b'HTTP/1.1 200 Good\r\nServer: PythonHTTPServer/0.1b\r\nContent-Length: 13\r\n\r\n' +
+                                 self.file_handler.read(client_request.uri))
         self.client.close()
