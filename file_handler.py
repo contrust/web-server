@@ -1,6 +1,9 @@
+import time
+
 from config import Config
 from timed_lru_cache import TimedLruCache
 from threading import RLock
+from response import Response
 
 
 class FileHandler:
@@ -10,21 +13,24 @@ class FileHandler:
         self.cache = TimedLruCache()
         self.lock = RLock()
 
-    def read(self, relative_path):
+    def get_response(self, relative_path: str) -> bytes:
         with self.lock:
-            absolute_path = f'{self.config.root}/{relative_path}'
-            if cached_value := self.cache[absolute_path] is not None:
-                return cached_value
+            absolute_path = f'{self.config.root}/{relative_path}' + \
+                (self.config.index if self.config.auto_index else '')
+            if (cached_value := self.cache[absolute_path]) is not None:
+                return cached_value.to_bytes()
             else:
                 try:
                     with open(absolute_path, mode='rb') as file:
-                        return file.read()
+                        self.cache[absolute_path] = Response(file.read())
+                        return self.cache[absolute_path].to_bytes()
                 except IOError:
+                    print('wtffffffffffffffffffffff')
                     if self.config.open_file_cache_errors:
-                        self.cache[absolute_path] = b'404 NOT FOUND'
-                        return self.cache[absolute_path]
-                    else:
-                        return b''
+                        self.cache[absolute_path] = Response(code=404)
+                        print('da suakaaaaaaaaaaaaadsfasd')
+                        print(self.cache[absolute_path])
+                    return Response(code=404).to_bytes()
 
 
 

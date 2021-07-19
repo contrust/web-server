@@ -1,10 +1,10 @@
 class Config:
     host: str = ''
-    port: int = 1238
+    port: int = 9932
     connection_timeout: float = 5
     max_threads: int = 5
     proxy_pass: dict[str, str] = {
-        '/puck/': 'localhost:8085/hi/',
+        '/puck/': 'localhost:8085/ji/',
         '/da/': 'localhost:8085/'
     }
     root: str = 'root'
