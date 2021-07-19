@@ -1,6 +1,6 @@
 class Config:
     host: str = ''
-    port: int = 1925
+    port: int = 1238
     connection_timeout: float = 5
     max_threads: int = 5
     proxy_pass: dict[str, str] = {
