@@ -3,6 +3,7 @@ from socket_handler import SocketHandler
 from request import Request
 from config import Config
 from file_handler import FileHandler
+from response import Response
 
 
 class Client:
@@ -29,6 +30,5 @@ class Client:
                         client_request.headers['Connection'] != 'keep-alive'):
                     break
         else:
-            client_handler.write(b'HTTP/1.1 200 Good\r\nServer: PythonHTTPServer/0.1b\r\nContent-Length: 13\r\n\r\n' +
-                                 self.file_handler.read(client_request.uri))
+            client_handler.write(self.file_handler.get_response(client_request.uri))
         self.client.close()
