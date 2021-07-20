@@ -16,7 +16,8 @@ class FileHandler:
     def get_response(self, relative_path: str) -> bytes:
         with self.lock:
             absolute_path = f'{self.config.root}/{relative_path}' + \
-                (self.config.index if self.config.auto_index else '')
+                (('/' if relative_path[-1] != '/' else '') +
+                 self.config.index if self.config.auto_index else '')
             if (cached_value := self.cache[absolute_path]) is not None:
                 return cached_value.to_bytes()
             else:

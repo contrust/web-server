@@ -1,3 +1,5 @@
+import re
+
 from config import Config
 
 
@@ -14,7 +16,7 @@ class Request:
         self.headers = dict(map(lambda x: x.split(': ', maxsplit=1),
                                 data[headers_index: body_index - 4].decode('utf-8').splitlines()))
         self.body = data[body_index:]
-        self.proxy_address = ''
+        self.proxy_regex = re.compile(r'(https?://)?(www\.)?(?P<host>[^/]*)(?P<path>/.*)?/?')
         print('created request instance')
 
     def to_bytes(self) -> bytes:
@@ -28,16 +30,18 @@ class Request:
                             self.headers.items())) + \
                b'\r\n' + self.body
 
-    def set_proxy_uri(self) -> bool:
+    def set_proxy_host_and_relative_path(self) -> bool:
         for location in self.config.proxy_pass:
-            if location == self.uri[:len(location)]:
-                print(self.uri.replace(location, self.config.proxy_pass[location], 1))
-                self.headers['Host'] = self.config.proxy_pass[location].split('/')[0]
-                self.uri = self.uri.replace(location, '/' + self.config.proxy_pass[location].split('/', maxsplit=1)[1], 1)
+            if location.rstrip('/') == self.uri[:len(location)].rstrip('/'):
+                proxy_match = self.proxy_regex.match(self.config.proxy_pass[location])
+                self.headers['Host'] = proxy_match.group('host')
+                self.uri = '/' + self.uri.replace(location.strip('/'),
+                                                  (proxy_match.group('path').strip('/')
+                                                   if proxy_match.group('path') is not None else '')).lstrip('/')
                 return True
         return False
 
-    def get_address(self) -> tuple[str, int]:
+    def get_address(self) -> tuple:
         return tuple(([pair[0], int(pair[1])]
                       if len(pair := self.headers['Host'].split(':')) == 2
                       else [pair[0], 80]))
