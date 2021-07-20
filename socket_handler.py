@@ -21,6 +21,8 @@ class SocketHandler:
             except Exception as e:
                 if e.errno == errno.EWOULDBLOCK:
                     break
+                else:
+                    return
         return b''.join(total_data)
 
     def write(self, data: bytes) -> None:
