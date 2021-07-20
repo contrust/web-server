@@ -6,7 +6,6 @@ class Response:
     config = Config()
 
     def __init__(self, body: bytes = b'', code: int = 200):
-        print('hiiiiiiiiiiii')
         self.version = 'HTTP/1.1'
         self.code = str(code)
         self.code_meaning = codes_meaning[code]
@@ -14,7 +13,6 @@ class Response:
             'Content-Length': str(len(body))
         }
         self.body = body
-        print('blya..')
 
     def to_bytes(self) -> bytes:
         return b' '.join([self.version.encode('utf-8'),

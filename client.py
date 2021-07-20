@@ -32,4 +32,3 @@ class Client:
         else:
             client_handler.write(self.file_handler.get_response(client_request.uri))
         self.client.close()
-        print('I"m so done...')

@@ -17,10 +17,8 @@ class Request:
                                 data[headers_index: body_index - 4].decode('utf-8').splitlines()))
         self.body = data[body_index:]
         self.proxy_regex = re.compile(r'(https?://)?(www\.)?(?P<host>[^/]*)(?P<path>/.*)?/?')
-        print('created request instance')
 
     def to_bytes(self) -> bytes:
-        print('and then I\'m biting')
         return b' '.join([self.method.encode('utf-8'),
                           self.uri.encode('utf-8'),
                           self.version.encode('utf-8')]) + \
