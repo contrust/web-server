@@ -5,7 +5,7 @@ from dataclasses import dataclass
 @dataclass
 class Config:
     host: str = ''
-    port: int = 4235
+    port: int = 2343
     root: str = 'root'
     max_threads: int = 5
     proxy_pass = {
