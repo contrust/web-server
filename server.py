@@ -1,5 +1,5 @@
 from config import Config
-from socket import socket, AF_INET, SOCK_STREAM
+from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 import concurrent.futures
 from client import Client
 from file_handler import FileHandler
@@ -13,6 +13,7 @@ class Server:
     def start(self) -> None:
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.config.max_threads) as executor:
             with socket(AF_INET, SOCK_STREAM) as server:
+                server.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
                 server.bind((self.config.host, self.config.port))
                 server.listen()
                 while 1:

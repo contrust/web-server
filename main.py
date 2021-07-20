@@ -1,4 +1,6 @@
 import argparse
+import sys
+
 from config import Config
 from server import Server
 
@@ -20,4 +22,9 @@ def main(args):
 
 
 if __name__ == '__main__':
-    main(parse_arguments())
+    try:
+        main(parse_arguments())
+    except KeyboardInterrupt:
+        print('\r   ')
+    finally:
+        sys.exit()

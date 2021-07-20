@@ -1,11 +1,10 @@
 {
-  "host": "localhost",
-  "port": 6262,
+  "host": "",
+  "port": 6182,
   "connection_timeout": 1,
   "max_threads": 5,
   "proxy_pass": {
-        "/loc/da": "localhost:4235/",
-        "/": "localhost:4235"
+        "/loc/da": "localhost:2343/"
     },
   "root": "root",
   "auto_index": true,
