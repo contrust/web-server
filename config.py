@@ -4,7 +4,7 @@ class Config:
     connection_timeout: float = 0.3
     max_threads: int = 5
     proxy_pass: dict = {
-        '/puck/da': 'localhost:8080/hi',
+        '/loc/da': 'localhost:8080/hi',
         '/': 'google.com'
     }
     root: str = 'root'

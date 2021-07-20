@@ -23,14 +23,13 @@ class FileHandler:
             else:
                 try:
                     with open(absolute_path, mode='rb') as file:
-                        self.cache[absolute_path] = Response(file.read())
-                        return self.cache[absolute_path].to_bytes()
+                        response = Response(file.read())
+                        if int(response.code) < 400 or self.config.open_file_cache_errors:
+                            self.cache[absolute_path] = response
+                        return response.to_bytes()
                 except IOError:
-                    print('wtffffffffffffffffffffff')
                     if self.config.open_file_cache_errors:
                         self.cache[absolute_path] = Response(code=404)
-                        print('da suakaaaaaaaaaaaaadsfasd')
-                        print(self.cache[absolute_path])
                     return Response(code=404).to_bytes()
 
 

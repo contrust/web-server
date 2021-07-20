@@ -10,7 +10,6 @@ class SocketHandler:
         self.socket = sock
 
     def read(self) -> bytes:
-        print('start reading..')
         total_data = []
         self.socket.setblocking(False)
         ready = select([self.socket], [], [], self.config.connection_timeout)
@@ -23,11 +22,7 @@ class SocketHandler:
             except Exception as e:
                 if e.errno == errno.EWOULDBLOCK:
                     break
-        print('done reading...')
         return b''.join(total_data)
 
     def write(self, data: bytes) -> None:
-        print('son are you writing?')
-        print('yes dad')
-        print(data)
         self.socket.sendall(data)
