@@ -1,19 +1,15 @@
-from config import Config
 from time import time
 from threading import RLock
 
 
 class TimedLruCacheEntry:
-    def __init__(self, value: object, expiration_time: float):
+    def __init__(self, value, expiration_time: float):
         self.value = value
         self.expiration_time = time() + expiration_time
 
 
 class TimedLruCache:
-    config = Config()
-
-    def __init__(self, maxsize=config.open_file_cache_size,
-                 expiration_time=config.open_file_cache_inactive_time):
+    def __init__(self, maxsize, expiration_time):
         self.entries = {}
         self.maxsize = maxsize
         self.expiration_time = expiration_time
