@@ -3,8 +3,6 @@ from response_codes_meaning import codes_meaning
 
 
 class Response:
-    config = Config()
-
     def __init__(self, body: bytes = b'', code: int = 200):
         self.version = 'HTTP/1.1'
         self.code = str(code)
