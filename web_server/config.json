@@ -1,0 +1,15 @@
+{
+  "host": "",
+  "port": 7732,
+  "connection_timeout": 1,
+  "max_threads": 5,
+  "proxy_pass": {
+        "/loc/da": "localhost:2343/"
+    },
+  "root": "root",
+  "auto_index": true,
+  "index": "index.html",
+  "open_file_cache_size": 5,
+  "open_file_cache_inactive_time": 60,
+  "open_file_cache_errors": true
+}
