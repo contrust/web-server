@@ -6,7 +6,7 @@ setup(
     packages=find_packages(include=['webserver', 'webserver.*']),
     entry_points={
         'console_scripts': [
-            'web-server-cli = webserver.__main__:main',
+            'webserver-cli = webserver.__main__:main',
         ]
     }
 )

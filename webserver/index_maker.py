@@ -15,13 +15,10 @@ def make_index(index_path: str, root: str) -> None:
         if relative_path != os.path.sep:
             page.write('<a href="../">../</a>\n')
         for directory in map(get_path_last_element, filter(os.path.isdir, get_directory_list(directory_path))):
-            print(directory)
             page.write(f'<a href="{directory}/">{directory}/</a>\n')
         for file in map(get_path_last_element, filter(os.path.isfile, get_directory_list(directory_path))):
-            print(file)
             if file != index:
                 page.write(f'<a href="{file}">{file}</a>\n')
-        print('da')
         page.write('</pre><hr>\n'
                    '</body>\n'
                    '</html>')
