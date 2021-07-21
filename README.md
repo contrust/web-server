@@ -10,9 +10,13 @@ pip install .
 ```
 
 ## Usage
+```sh
+python3 -m webserver -c config.json
+```
+Or from any directory you can use
 
 ```sh
-webserver-cli -c config.json
+webserver-cli -c path/to/config.json
 ```
 
 ## Run tests
