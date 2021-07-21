@@ -5,11 +5,11 @@ from dataclasses import dataclass
 @dataclass
 class Config:
     host: str = ''
-    port: int = 2373
+    port: int = 8080
     root: str = 'root'
     max_threads: int = 5
     proxy_pass = {
-        '/loc/da': 'localhost:8080/hi',
+        '/proxy': 'localhost:7080/test',
     }
     auto_index: bool = True
     index: str = 'index.html'

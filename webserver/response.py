@@ -1,4 +1,4 @@
-from web_server.response_codes_meaning import codes_meaning
+from webserver.response_codes_meaning import codes_meaning
 
 
 class Response:

@@ -1,6 +1,3 @@
-import re
-
-
 class Request:
     def __init__(self, data: bytes):
         if not data:
@@ -12,7 +9,6 @@ class Request:
         self.headers = dict(map(lambda x: x.split(': ', maxsplit=1),
                                 data[headers_index: body_index - 4].decode('utf-8').splitlines()))
         self.body = data[body_index:]
-        self.proxy_regex = re.compile(r'(https?://)?(www\.)?(?P<host>[^/]*)(?P<path>/.*)?/?')
 
     def to_bytes(self) -> bytes:
         return b' '.join([self.method.encode('utf-8'),

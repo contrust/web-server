@@ -1,12 +1,12 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='web_server',
+    name='webserver',
     version='0.1.0',
-    packages=find_packages(include=['web_server', 'web_server.*']),
+    packages=find_packages(include=['webserver', 'webserver.*']),
     entry_points={
         'console_scripts': [
-            'web-server-cli = web_server.__main__:main',
+            'web-server-cli = webserver.__main__:main',
         ]
     }
 )

@@ -1,8 +1,8 @@
-from web_server.config import Config
+from webserver.config import Config
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 import concurrent.futures
-from web_server.client import Client
-from web_server.file_handler import FileHandler
+from webserver.client import Client
+from webserver.file_handler import FileHandler
 
 
 class Server:

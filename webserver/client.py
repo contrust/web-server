@@ -1,8 +1,9 @@
+import re
 from socket import socket, AF_INET, SOCK_STREAM
-from web_server.socket_handler import SocketHandler
-from web_server.request import Request
-from web_server.config import Config
-from web_server.file_handler import FileHandler
+from webserver.socket_handler import SocketHandler
+from webserver.request import Request
+from webserver.config import Config
+from webserver.file_handler import FileHandler
 
 
 class Client:
@@ -10,6 +11,7 @@ class Client:
         self.client = client
         self.config = config
         self.file_handler = file_handler
+        self.proxy_regex = re.compile(r'(https?://)?(www\.)?(?P<host>[^/]*)(?P<path>/.*)?')
 
     def run(self) -> None:
         client_handler = SocketHandler(self.client, timeout=self.config.connection_timeout)
@@ -34,11 +36,10 @@ class Client:
 
     def set_proxy_host_and_relative_path(self, request: Request) -> bool:
         for location in self.config.proxy_pass:
-            if location.rstrip('/') == request.uri[:len(location)].rstrip('/'):
-                proxy_match = request.proxy_regex.match(self.config.proxy_pass[location])
-                request.headers['Host'] = proxy_match.group('host')
-                request.uri = '/' + request.uri.replace(location.strip('/'),
-                                                        (proxy_match.group('path').strip('/')
-                                                        if proxy_match.group('path') is not None else '')).lstrip('/')
+            if request.uri.startswith(location + '/'):
+                proxy_match = self.proxy_regex.match(self.config.proxy_pass[location])
+                host, path = proxy_match.group('host'), proxy_match.group('path')
+                request.headers['Host'] = host
+                request.uri = request.uri.replace(location, path if path else '')
                 return True
         return False

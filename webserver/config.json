@@ -1,10 +1,10 @@
 {
   "host": "",
-  "port": 7732,
+  "port": 7080,
   "connection_timeout": 1,
   "max_threads": 5,
   "proxy_pass": {
-        "/loc/da": "localhost:2343/"
+        "/proxy": "localhost:8080"
     },
   "root": "root",
   "auto_index": true,

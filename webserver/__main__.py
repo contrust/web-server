@@ -2,8 +2,8 @@
 import argparse
 import sys
 
-from web_server.config import Config
-from web_server.server import Server
+from webserver.config import Config
+from webserver.server import Server
 
 
 def parse_arguments():

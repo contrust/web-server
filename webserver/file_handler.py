@@ -1,7 +1,8 @@
 import os
 from threading import RLock
-from web_server.timed_lru_cache import TimedLruCache
-from web_server.response import Response
+from webserver.timed_lru_cache import TimedLruCache
+from webserver.response import Response
+from webserver.index_maker import make_index
 
 
 class FileHandler:
@@ -16,24 +17,27 @@ class FileHandler:
         self.cache = TimedLruCache(maxsize=open_file_cache_size,
                                    expiration_time=open_file_cache_inactive_time)
         self.lock = RLock()
-        self.root = root
+        self.root = f'{os.path.dirname(__file__)}{os.path.sep}{root}'
         self.index = index
         self.auto_index = auto_index
         self.open_file_cache_errors = open_file_cache_errors
 
     def get_response(self, relative_path: str) -> Response:
         with self.lock:
-            absolute_path = f'{os.path.dirname(__file__)}{os.path.sep}{self.root}' \
-                            f'{os.path.sep}{relative_path[1:].replace("/", os.path.sep)}' + \
-                ((os.path.sep if relative_path[-1] != os.path.sep else '') +
-                 self.index if self.auto_index else '')
+            absolute_path = f'{self.root}{relative_path.replace("/", os.path.sep)}'
+            if self.auto_index and absolute_path[-1] == os.path.sep:
+                absolute_path += self.index
             if (cached_value := self.cache[absolute_path]) is not None:
                 return cached_value
             else:
                 try:
+                    if absolute_path.endswith('/' + self.index):
+                        make_index(absolute_path, self.root)
                     with open(absolute_path, mode='rb') as file:
-                        self.cache[absolute_path] = Response(file.read())
-                        return self.cache[absolute_path]
+                        response = Response(file.read())
+                        if not absolute_path.endswith('/' + self.index):
+                            self.cache[absolute_path] = response
+                        return response
                 except IOError:
                     if self.open_file_cache_errors:
                         self.cache[absolute_path] = Response(code=404)
