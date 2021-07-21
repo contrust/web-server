@@ -1,5 +1,6 @@
-from web_server.timed_lru_cache import TimedLruCache
+import os
 from threading import RLock
+from web_server.timed_lru_cache import TimedLruCache
 from web_server.response import Response
 
 
@@ -22,8 +23,9 @@ class FileHandler:
 
     def get_response(self, relative_path: str) -> Response:
         with self.lock:
-            absolute_path = f'{self.root}/{relative_path}' + \
-                (('/' if relative_path[-1] != '/' else '') +
+            absolute_path = f'{os.path.dirname(__file__)}{os.path.sep}{self.root}' \
+                            f'{os.path.sep}{relative_path[1:].replace("/", os.path.sep)}' + \
+                ((os.path.sep if relative_path[-1] != os.path.sep else '') +
                  self.index if self.auto_index else '')
             if (cached_value := self.cache[absolute_path]) is not None:
                 return cached_value
