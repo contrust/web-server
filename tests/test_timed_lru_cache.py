@@ -16,10 +16,10 @@ class TimedLruCacheSize(unittest.TestCase):
 
 class TimedLruCacheTime(unittest.TestCase):
     def test_removing_object_after_expiration_time(self):
-        cache = TimedLruCache(maxsize=1, expiration_time=0.25)
+        cache = TimedLruCache(maxsize=1, expiration_time=0.05)
         cache['cat'] = 'dog'
         self.assertIsNotNone(cache['cat'])
-        time.sleep(0.25)
+        time.sleep(0.05)
         self.assertIsNone(cache['cat'])
 
 
