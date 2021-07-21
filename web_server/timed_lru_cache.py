@@ -37,3 +37,5 @@ class TimedLruCache:
             except KeyError:
                 return None
 
+    def __contains__(self, item):
+        return item in self.entries
