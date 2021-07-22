@@ -17,7 +17,7 @@ class FileHandler:
         self.cache = TimedLruCache(maxsize=open_file_cache_size,
                                    expiration_time=open_file_cache_inactive_time)
         self.lock = RLock()
-        self.root = f'{os.path.dirname(__file__)}{os.path.sep}{root}'
+        self.root = f'{os.path.dirname(__file__)}{os.path.sep}{root}' if not os.path.isabs(root) else root
         self.index = index
         self.auto_index = auto_index
         self.open_file_cache_errors = open_file_cache_errors
