@@ -7,7 +7,9 @@ from webserver.server import Server
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        prog=None if globals().get('__spec__') is None else 'python3 -m {}'.format(__spec__.name.partition('.')[0])
+    )
     parser.add_argument('-c', '--config', metavar='config.json', required=False,
                         help='set config file with json format,'
                              ' attributes\' values in config.py are used by default '
@@ -37,4 +39,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

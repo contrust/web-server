@@ -1,0 +1,15 @@
+{
+    "host": "",
+    "port": 8080,
+    "root": "root",
+    "max_threads": 5,
+    "proxy_pass": {
+        "/proxy": "localhost:7080/test"
+    },
+    "auto_index": true,
+    "index": "index.html",
+    "connection_timeout": 0.3,
+    "open_file_cache_size": 5,
+    "open_file_cache_inactive_time": 60,
+    "open_file_cache_errors": true
+}

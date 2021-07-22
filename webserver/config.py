@@ -25,5 +25,4 @@ class Config:
 
     def unload(self, path: str) -> None:
         with open(path, mode='w') as file:
-            print(self.__dict__)
             json.dump(self.__dict__, file, indent=4)
