@@ -31,11 +31,11 @@ class FileHandler:
                 return cached_value
             else:
                 try:
-                    if absolute_path.endswith('/' + self.index):
+                    if absolute_path.endswith(os.path.sep + self.index):
                         make_index(absolute_path, self.root)
                     with open(absolute_path, mode='rb') as file:
                         response = Response(file.read())
-                        if not absolute_path.endswith('/' + self.index):
+                        if not absolute_path.endswith(os.path.sep + self.index):
                             self.cache[absolute_path] = response
                         return response
                 except IOError:
