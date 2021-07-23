@@ -29,6 +29,16 @@ python3 -m webserver --get-config config_name
 ```sh
 python3 -m unittest
 ```
+## Features
+
+* proxy_pass
+* serve static files / directories with a cache of open files
+* auto-index for catalogs
+* logging requests
+* support for keep-alive connections
+* configuration via config file
+* multithreading
+
 
 ## Author
 
