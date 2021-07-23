@@ -1,6 +1,9 @@
 import logging
 import re
 import socket
+import copy
+from time import time
+from datetime import datetime, timezone
 from socket import socket, AF_INET, SOCK_STREAM
 from webserver.socket_handler import SocketHandler
 from webserver.request import Request
@@ -18,16 +21,14 @@ class Client:
 
     def run(self) -> None:
         while 1:
+            start_time = time()
             data = self.client_handler.read()
             if data == b'timeout':
                 break
             request = Request(byte_request=data)
-            initial_request_path = request.path
-            logging.info(f'processing request {request.method} {request.path}')
             response = self.get_response(request)
             self.client_handler.write(bytes(response))
-            logging.info(f'received request {request.method} {initial_request_path}, '
-                         f'returned response {response.code} ({response.code_meaning})')
+            logging.info(self.get_log_string(request, response, time() - start_time))
             if ('Connection' not in request.headers or
                     request.headers['Connection'] != 'keep-alive'):
                 break
@@ -36,6 +37,7 @@ class Client:
         self.client_handler.socket.close()
 
     def get_response(self, request: Request) -> Response:
+        request = copy.deepcopy(request)
         if self.set_proxy_host_and_relative_path(request):
             if not self.proxy_handler:
                 proxy = socket(AF_INET, SOCK_STREAM)
@@ -52,9 +54,17 @@ class Client:
                 proxy_match = self.proxy_regex.match(self.config.proxy_pass[location])
                 host, path = proxy_match.group('host'), proxy_match.group('path')
                 request.headers['Host'] = host
-                if location:
-                    request.path = request.path.replace(f'/{location}', path if path else '')
-                elif path:
-                    request.path = request.path.replace('/', f'{path}/', 1)
+                request.path = request.path.replace(f'/{location}',
+                                                    (path if path else '') +
+                                                    ('/' if not location else ''), 1)
                 return True
         return False
+
+    def get_log_string(self, request: Request, response: Response, processing_time: float) -> str:
+        return f"{self.client_handler.socket.getpeername()[0]} - - " \
+               f"[{datetime.now(timezone.utc).strftime('%d/%b/%Y:%H:%M:%S %z')}] \"" \
+               f"{request.get_start_line()}\" " \
+               f"{response.code} {response.headers.get('Content-Length', 0)} \"" \
+               f"{response.headers.get('Referer', '-')}\" \"" \
+               f"{response.headers.get('User-Agent', '-')}\" " \
+               f"{int(processing_time * 1000)}"
