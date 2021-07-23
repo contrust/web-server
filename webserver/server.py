@@ -1,3 +1,4 @@
+import logging
 from webserver.config import Config
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 import concurrent.futures
@@ -9,6 +10,9 @@ class Server:
     def __init__(self, config: Config):
         self.config = config
         self.file_handler = FileHandler(config)
+        logging.basicConfig(filename=config.log_file,
+                            level=logging.DEBUG,
+                            format='%(asctime)s %(message)s')
 
     def run(self) -> None:
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.config.max_threads) as executor:
@@ -16,6 +20,7 @@ class Server:
                 server.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
                 server.bind((self.config.hostname, self.config.port))
                 server.listen()
+                logging.info(f'{self.config.hostname} launched with {self.config.port} port')
                 while 1:
                     client, address = server.accept()
                     executor.submit(Client(client=client,

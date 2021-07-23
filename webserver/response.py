@@ -8,8 +8,8 @@ CODES_DESCRIPTION = {
 
 
 class Response(HttpMessage):
-    def __init__(self, raw_data: bytes = b'', body: bytes = b'', code: int = 200):
-        HttpMessage.__init__(self, raw_data)
+    def __init__(self, raw_response: bytes = b'', body: bytes = b'', code: int = 200):
+        HttpMessage.__init__(self, raw_response)
         self.version, self.code, self.code_meaning = '', '', ''
         if self.start_line:
             self.version, self.code, self.code_meaning = self.start_line
