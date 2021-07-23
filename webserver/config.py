@@ -4,16 +4,16 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Config:
-    host: str = ''
+    hostname: str = 'localhost'
     port: int = 8080
     root: str = 'root'
     max_threads: int = 5
     proxy_pass: dict = field(default_factory=lambda: {
-        '/proxy': 'localhost:7080/test'
+        '/proxer-bitboxer': 'localhost:7080'
     })
     auto_index: bool = True
     index: str = 'index.html'
-    connection_timeout: float = 0.3
+    connection_timeout: float = 5
     open_file_cache_size: int = 5
     open_file_cache_inactive_time: int = 60
     open_file_cache_errors: bool = True

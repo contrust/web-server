@@ -1,4 +1,4 @@
-from socket import socket
+import socket
 from select import select
 import errno
 
@@ -18,12 +18,10 @@ class SocketHandler:
                 total_data.append(data)
                 if not data:
                     break
-            except Exception as e:
-                if e.errno == errno.EWOULDBLOCK:
-                    break
-                else:
-                    return
-        return b''.join(total_data)
+            except BlockingIOError:
+                return b''.join(total_data)
+        return b'timeout'
 
     def write(self, data: bytes) -> None:
+        print(data)
         self.socket.sendall(data)

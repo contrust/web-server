@@ -28,11 +28,10 @@ def main():
             sys.exit()
         if args_dict['config'] is not None:
             server_config.load(args_dict['config'])
-        Server(server_config).start()
+        server = Server(server_config)
+        server.run()
     except KeyboardInterrupt:
         print('\r   ')
-    except Exception as e:
-        print(e)
     finally:
         sys.exit()
 
