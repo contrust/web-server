@@ -27,7 +27,7 @@ class Config:
     log_file: str = 'log.txt'
     max_threads: int = 5
     proxy_pass: dict = field(default_factory=lambda: {
-        'master': 'localhost:7080'
+        'my': 'localhost:7080/'
     })
     auto_index: bool = True
     index: str = 'index.html'
