@@ -10,13 +10,18 @@ pip install .
 ```
 
 ## Usage
+Show help
 ```sh
-python3 -m webserver -c config.json
+python3 -m webserver -h
 ```
-Or from any directory you can use
+Run server with config file
 
 ```sh
-webserver-cli -c path/to/config.json
+python3 -m webserver -c path/to/config
+```
+Get config file with default values in current directory
+```sh
+python3 -m webserver --get-config config_name
 ```
 
 ## Run tests

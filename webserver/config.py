@@ -23,7 +23,7 @@ class Config:
     """
     hostname: str = 'localhost'
     port: int = 8080
-    root: str = 'soup'
+    root: str = 'root'
     log_file: str = 'log.txt'
     max_threads: int = 5
     proxy_pass: dict = field(default_factory=lambda: {
