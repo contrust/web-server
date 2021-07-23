@@ -1,6 +1,5 @@
 import socket
 from select import select
-import errno
 
 
 class SocketHandler:
@@ -23,5 +22,4 @@ class SocketHandler:
         return b'timeout'
 
     def write(self, data: bytes) -> None:
-        print(data)
         self.socket.sendall(data)

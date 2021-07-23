@@ -5,7 +5,6 @@ class Request(HttpMessage):
     def __init__(self, raw_data: bytes):
         HttpMessage.__init__(self, raw_data)
         self.method, self.uri, self.version = '', '', ''
-        print(self.start_line)
         if self.start_line:
             self.method, self.uri, self.version = self.start_line
 

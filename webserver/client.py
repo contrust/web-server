@@ -4,14 +4,13 @@ from socket import socket, AF_INET, SOCK_STREAM
 from webserver.socket_handler import SocketHandler
 from webserver.request import Request
 from webserver.response import Response
-from webserver.config import Config
 from webserver.file_handler import FileHandler
 
 
 class Client:
-    def __init__(self, client: socket, config: Config, file_handler: FileHandler):
+    def __init__(self, client: socket, file_handler: FileHandler):
         self.client = client
-        self.config = config
+        self.config = file_handler.config
         self.file_handler = file_handler
         self.proxy_regex = re.compile(r'(https?://)?(www\.)?(?P<host>[^/]*)(?P<path>/.*)?')
 
@@ -23,6 +22,7 @@ class Client:
             if data == b'timeout':
                 break
             client_request = Request(raw_data=data)
+            print(client_request.method, client_request.uri, client_request.headers['Host'])
             if self.set_proxy_host_and_relative_path(client_request):
                 if not proxy_handler:
                     proxy = socket(AF_INET, SOCK_STREAM)
@@ -31,9 +31,11 @@ class Client:
                 proxy_handler.write(bytes(client_request))
                 response = Response(raw_data=proxy_handler.read())
                 client_handler.write(bytes(response))
+                print(response.code, response.code_meaning, client_request.uri, client_request.headers['Host'])
             else:
-                response = self.file_handler.get_response(client_request.uri)
+                response = self.file_handler.get_response(client_request)
                 client_handler.write(bytes(response))
+                print(response.code, response.code_meaning, client_request.uri, client_request.headers['Host'])
             if ('Connection' not in client_request.headers or
                     client_request.headers['Connection'] != 'keep-alive'):
                 break

@@ -1,5 +1,10 @@
-from webserver.response_codes_meaning import codes_meaning
 from webserver.http_message import HttpMessage
+
+CODES_DESCRIPTION = {
+    200: 'Success',
+    304: 'Not Modified',
+    404: 'Not Found',
+}
 
 
 class Response(HttpMessage):
@@ -11,7 +16,7 @@ class Response(HttpMessage):
         else:
             self.version = 'HTTP/1.1'
             self.code = str(code)
-            self.code_meaning = codes_meaning[code]
+            self.code_meaning = CODES_DESCRIPTION[code]
             self.start_line = self.get_start_line()
             self.headers = {
                 'Content-Length': str(len(body))

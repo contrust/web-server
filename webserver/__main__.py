@@ -8,7 +8,7 @@ from webserver.server import Server
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        prog=None if globals().get('__spec__') is None else 'python3 -m {}'.format(__spec__.name.partition('.')[0])
+        prog=None if not globals().get('__spec__') else f'python3 -m {__spec__.name.partition(".")[0]}'
     )
     parser.add_argument('-c', '--config', metavar='config.json', required=False,
                         help='set config file with json format,'
@@ -21,14 +21,14 @@ def parse_arguments():
 
 def main():
     try:
-        server_config = Config()
+        config = Config()
         args_dict = vars(parse_arguments())
         if args_dict['get_config'] is not None:
-            server_config.unload(args_dict['get_config'])
+            config.unload(args_dict['get_config'])
             sys.exit()
         if args_dict['config'] is not None:
-            server_config.load(args_dict['config'])
-        server = Server(server_config)
+            config.load(args_dict['config'])
+        server = Server(config)
         server.run()
     except KeyboardInterrupt:
         print('\r   ')

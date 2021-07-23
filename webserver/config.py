@@ -9,7 +9,7 @@ class Config:
     root: str = 'root'
     max_threads: int = 5
     proxy_pass: dict = field(default_factory=lambda: {
-        '/proxer-bitboxer': 'localhost:7080'
+        '/proxy': 'localhost:7080'
     })
     auto_index: bool = True
     index: str = 'index.html'
