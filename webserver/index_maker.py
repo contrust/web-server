@@ -2,6 +2,7 @@ import os
 
 
 def make_index(index_path: str, root: str) -> None:
+    index_path = os.path.normpath(index_path)
     index, directory_path = get_path_last_element(index_path), get_dir_from_path(index_path)
     relative_path = directory_path.replace(root, "")
     with open(index_path, mode='w') as page:
@@ -30,6 +31,7 @@ def get_directory_list(directory_path: str) -> iter:
 
 def get_path_last_element(path: str) -> str:
     return path[path.rfind(os.path.sep) + 1:]
+
 
 def get_dir_from_path(path: str) -> str:
     return path[:path.rfind(os.path.sep) + 1]
