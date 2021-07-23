@@ -3,12 +3,18 @@ from threading import RLock
 
 
 class TimedLruCacheEntry:
+    """
+    Cache entry with expiration time.
+    """
     def __init__(self, value, expiration_time: float):
         self.value = value
         self.expiration_time = time() + expiration_time
 
 
 class TimedLruCache:
+    """
+    Cache which deletes its' entry when it wasn't used for a certain time.
+    """
     def __init__(self, maxsize, expiration_time):
         self.entries = {}
         self.maxsize = maxsize

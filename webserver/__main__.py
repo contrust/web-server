@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import argparse
+import logging
 import sys
-
 from webserver.config import Config
 from webserver.server import Server
 
@@ -33,6 +33,7 @@ def main():
     except KeyboardInterrupt:
         print('\r   ')
     finally:
+        logging.info(f'{config.hostname} closed with {config.port} port')
         sys.exit()
 
 

@@ -4,8 +4,8 @@ HTTP_REGEX = re.compile(rb'([^\s]+)\s([^\s]+)\s(.*?)\r\n(?P<headers>(?:.*?: .*?\
 
 
 class HttpMessage:
-    def __init__(self, raw_data: bytes = b''):
-        match = HTTP_REGEX.match(raw_data)
+    def __init__(self, raw_message: bytes = b''):
+        match = HTTP_REGEX.match(raw_message)
         self.start_line, self.headers, self.body = [], {}, b''
         if match:
             self.start_line = map(lambda x: x.decode('utf-8'), [match.group(1), match.group(2), match.group(3)])
