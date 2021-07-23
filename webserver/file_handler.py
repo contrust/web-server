@@ -34,7 +34,7 @@ class FileHandler:
                     if absolute_path.endswith(os.path.sep + self.index):
                         make_index(absolute_path, self.root)
                     with open(absolute_path, mode='rb') as file:
-                        response = Response(file.read())
+                        response = Response(body=file.read())
                         if not absolute_path.endswith(os.path.sep + self.index):
                             self.cache[absolute_path] = response
                         return response
