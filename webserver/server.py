@@ -12,7 +12,7 @@ class Server:
         self.file_handler = FileHandler(config)
         logging.basicConfig(filename=config.log_file,
                             level=logging.DEBUG,
-                            format='%(asctime)s %(message)s')
+                            format='%(message)s')
 
     def run(self) -> None:
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.config.max_threads) as executor:
@@ -20,7 +20,6 @@ class Server:
                 server.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
                 server.bind((self.config.hostname, self.config.port))
                 server.listen()
-                logging.info(f'{self.config.hostname} launched with {self.config.port} port')
                 while 1:
                     client, address = server.accept()
                     executor.submit(Client(client=client,
