@@ -10,16 +10,21 @@ pip install .
 ```
 
 ## Usage
+
 Show help
+
 ```sh
 python3 -m webserver -h
 ```
+
 Run server with config file
 
 ```sh
 python3 -m webserver -c path/to/config
 ```
+
 Get config file with default values in current directory
+
 ```sh
 python3 -m webserver --get-config config_name
 ```

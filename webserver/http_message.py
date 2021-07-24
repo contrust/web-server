@@ -1,12 +1,16 @@
 import re
 
 HTTP_MESSAGE_REGEX = re.compile(
-    rb'(?P<line>([^\s]+)\s([^\s]+)\s(.*?))\r\n(?P<headers>(?:.*?: .*?\r\n)*)\r\n(?P<body>.*)', re.DOTALL)
-HOST_REGEX = re.compile(r'(?P<hostname>[^:]+)(:(?P<port>\d{1,5}))?')
+    rb'(?P<line>([^\s]+)\s([^\s]+)\s(.*?))\r\n'
+    rb'(?P<headers>(?:.*?: .*?\r\n)*)\r\n'
+    rb'(?P<body>.*)', re.DOTALL)
+HOST_REGEX = re.compile(
+    r'(?P<hostname>[^:]+)(:(?P<port>\d{1,5}))?')
 
 
 class HttpMessage:
-    def __init__(self, line: str = '', headers: dict = None, body: bytes = b''):
+    def __init__(self, line: str = '',
+                 headers: dict = None, body: bytes = b''):
         self.line = line
         self.headers = headers if headers else {}
         self.body = body
@@ -17,7 +21,9 @@ class HttpMessage:
             self.line = match.group('line').decode('utf-8')
             if match.group('headers'):
                 self.headers = dict(map(lambda x: x.split(': ', maxsplit=1),
-                                        match.group('headers').decode('utf-8').splitlines()))
+                                        match.group('headers')
+                                        .decode('utf-8')
+                                        .splitlines()))
             if match.group('body'):
                 self.body = match.group('body')
             return self
@@ -26,7 +32,8 @@ class HttpMessage:
     @property
     def host(self) -> tuple:
         match = HOST_REGEX.match(self.headers.get('Host', ''))
-        hostname, port = match.group('hostname'), int(port) if (port := match.group('port')) else 80
+        hostname = match.group('hostname')
+        port = int(port) if (port := match.group('port')) else 80
         return tuple([hostname, port])
 
     def __bytes__(self) -> bytes:

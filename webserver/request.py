@@ -1,12 +1,18 @@
 import re
 from webserver.http_message import HttpMessage
 
-REQUEST_REGEX = re.compile(r'(?P<method>GET|PUT|POST|HEAD|OPTIONS|DELETE) (?P<path>/[^\s]*) (?P<version>HTTP/\d\.\d)')
+REQUEST_REGEX = re.compile(r'(?P<method>GET|PUT|POST|HEAD|OPTIONS|DELETE) '
+                           r'(?P<path>/[^\s]*) '
+                           r'(?P<version>HTTP/\d\.\d)')
 
 
 class Request(HttpMessage):
-    def __init__(self, method: str = 'GET', path: str = '/', version='HTTP/1.1',
-                 line: str = '', headers: dict = None, body: bytes = b''):
+    def __init__(self, method: str = 'GET',
+                 path: str = '/',
+                 version='HTTP/1.1',
+                 line: str = '',
+                 headers: dict = None,
+                 body: bytes = b''):
         self.method = method
         self.path = path
         self.version = version
