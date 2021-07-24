@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import sys
+
 from webserver.config import Config
 from webserver.server import Server
 

@@ -1,4 +1,5 @@
 import re
+
 from webserver.http_message import HttpMessage
 
 REQUEST_REGEX = re.compile(r'(?P<method>GET|PUT|POST|HEAD|OPTIONS|DELETE) '
