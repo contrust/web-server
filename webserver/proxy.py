@@ -1,7 +1,7 @@
 import copy
 import re
 
-from webserver.request import Request
+from webserver.http_message import Request
 
 PROXY_REGEX = re.compile(r'(https?://)?(www\.)?(?P<host>[^/]*)(?P<path>/.*)?')
 

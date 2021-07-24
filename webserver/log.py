@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 
-from webserver.request import Request
-from webserver.response import Response
+from webserver.http_message import Request, Response
 
 
 def get_log_message(client: str,

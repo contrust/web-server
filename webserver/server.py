@@ -5,11 +5,10 @@ import time
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 
 from webserver.config import Config
-from webserver.index_maker import make_index
+from webserver.index import make_index
 from webserver.log import get_log_message
 from webserver.proxy import try_get_proxy_request
-from webserver.request import Request
-from webserver.response import Response
+from webserver.http_message import Request, Response
 from webserver.socket_extensions import receive_all
 from webserver.timed_lru_cache import TimedLruCache
 
