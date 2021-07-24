@@ -3,7 +3,8 @@ import os
 
 def make_index(index_path: str, root: str) -> None:
     index_path = os.path.normpath(index_path)
-    index, directory_path = get_path_last_element(index_path), get_dir_from_path(index_path)
+    index = get_path_last_element(index_path)
+    directory_path = get_dir_from_path(index_path)
     relative_path = directory_path.replace(root, "")
     with open(index_path, mode='w') as page:
         page.write('<!DOCTYPE html>\n'
@@ -15,9 +16,15 @@ def make_index(index_path: str, root: str) -> None:
                    f'<h1>Index of {relative_path}</h1><hr><pre>')
         if relative_path != os.path.sep:
             page.write('<a href="../">../</a>\n')
-        for directory in map(get_path_last_element, filter(os.path.isdir, get_directory_list(directory_path))):
+        for directory in map(get_path_last_element,
+                             filter(os.path.isdir,
+                                    get_directory_list(
+                                        directory_path))):
             page.write(f'<a href="{directory}/">{directory}/</a>\n')
-        for file in map(get_path_last_element, filter(os.path.isfile, get_directory_list(directory_path))):
+        for file in map(get_path_last_element,
+                        filter(os.path.isfile,
+                               get_directory_list(
+                                   directory_path))):
             if file != index:
                 page.write(f'<a href="{file}">{file}</a>\n')
         page.write('</pre><hr>\n'

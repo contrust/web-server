@@ -2,7 +2,9 @@ import re
 
 from webserver.http_message import HttpMessage
 
-RESPONSE_REGEX = re.compile(r'(?P<version>HTTP/\d\.\d) (?P<code>\d{3}) (?P<code_description>.*)')
+RESPONSE_REGEX = re.compile(r'(?P<version>HTTP/\d\.\d) '
+                            r'(?P<code>\d{3}) '
+                            r'(?P<code_description>.*)')
 CODES_DESCRIPTION = {
     100: ('Continue', 'Request received, please continue'),
     101: ('Switching Protocols',

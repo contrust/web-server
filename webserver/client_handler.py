@@ -1,9 +1,7 @@
 import logging
 import os
 import re
-import socket
 import copy
-import traceback
 from time import time
 from datetime import datetime, timezone
 from socket import socket, AF_INET, SOCK_STREAM
@@ -19,28 +17,27 @@ PROXY_REGEX = re.compile(r'(https?://)?(www\.)?(?P<host>[^/]*)(?P<path>/.*)?')
 
 
 def receive_all(sock, timeout) -> bytes:
-    print('hello')
     total_data = []
     sock.setblocking(0)
     ready = select([sock], [], [], timeout)
     while ready[0]:
         try:
-            print('da')
             data = sock.recv(8192)
-            print('net')
             total_data.append(data)
             if not data:
                 break
-        except:
-            print('a?')
+        except BlockingIOError:
             return b''.join(total_data)
-    print('can you hear me?')
     return b'timeout'
 
 
-def get_log_string(client: socket, request: Request, response: Response, processing_time: float) -> str:
+def get_log_string(client: socket,
+                   request: Request,
+                   response: Response,
+                   processing_time: float) -> str:
     return f"{client.getpeername()[0]} - - " \
-           f"[{datetime.now(timezone.utc).strftime('%d/%b/%Y:%H:%M:%S %z')}] \"" \
+           f"[{datetime.now(timezone.utc).strftime('%d/%b/%Y:%H:%M:%S %z')}]" \
+           f" \"" \
            f"{request.line}\" " \
            f"{response.code} {response.headers.get('Content-Length', 0)} \"" \
            f"{request.headers.get('Referer', '-')}\" \"" \
@@ -58,21 +55,17 @@ class ClientHandler:
     def run(self) -> None:
         while 1:
             start_time = time()
-            raw_request = receive_all(self.client, self.config.keep_alive_timeout)
+            raw_request = receive_all(self.client,
+                                      self.config.keep_alive_timeout)
             if raw_request == b'timeout':
                 break
             request = Request().parse(raw_request)
             response = self.get_response(request)
-            print('otpravili?')
-            try:
-                print(response.__dict__)
-                print('i love you')
-                raw_response = bytes(response)
-            except Exception as e:
-                traceback.print_exc(e)
+            raw_response = bytes(response)
             self.client.sendall(raw_response)
             print('nu da...')
-            logging.info(get_log_string(self.client, request, response, time() - start_time))
+            logging.info(get_log_string(self.client, request,
+                                        response, time() - start_time))
             if ('Connection' not in request.headers or
                     request.headers['Connection'] != 'keep-alive'):
                 break
@@ -83,19 +76,16 @@ class ClientHandler:
     def get_response(self, request: Request) -> Response:
         if (proxy_request := self.try_get_proxy_request(request)) is not None:
             if not self.proxy:
-                print('hi')
                 self.proxy = socket(AF_INET, SOCK_STREAM)
                 self.proxy.connect(proxy_request.host)
-                print(proxy_request.host)
-                print('i am good')
             self.proxy.sendall(bytes(proxy_request))
-            raw_proxy_response = receive_all(self.proxy, self.config.keep_alive_timeout)
-            print('davai poparsim')
+            raw_proxy_response = receive_all(self.proxy,
+                                             self.config.keep_alive_timeout)
             proxy_response = Response().parse(raw_proxy_response)
-            print('nu vot i poparsili')
             return proxy_response
         else:
-            absolute_path = f'{self.config.root}{request.path.replace("/", os.path.sep)}'
+            absolute_path = f'{self.config.root}' \
+                            f'{request.path.replace("/", os.path.sep)}'
             if self.config.auto_index and absolute_path[-1] == os.path.sep:
                 absolute_path += self.config.index
             if cached_value := self.cache[absolute_path]:
@@ -106,7 +96,8 @@ class ClientHandler:
                         make_index(absolute_path, self.config.root)
                     with open(absolute_path, mode='rb') as file:
                         response = Response(body=file.read())
-                        if not os.path.basename(absolute_path) == self.config.index:
+                        if not os.path.basename(absolute_path) == \
+                                self.config.index:
                             self.cache[absolute_path] = response
                 except IOError:
                     response = Response(code=404)
@@ -118,12 +109,15 @@ class ClientHandler:
         for location in self.config.proxy_pass:
             if request.path.startswith(f'/{location}/') or not location:
                 proxy_request = copy.deepcopy(request)
-                proxy_match = PROXY_REGEX.match(self.config.proxy_pass[location])
-                host, path = proxy_match.group('host'), proxy_match.group('path')
+                proxy_match = PROXY_REGEX.match(
+                    self.config.proxy_pass[location])
+                host, path = proxy_match.group('host'), proxy_match.group(
+                    'path')
                 proxy_request.headers['Host'] = host
-                proxy_request.path = proxy_request.path.replace(f'/{location}',
-                                                                (path if path else '') +
-                                                                ('/' if not location else ''), 1)
-                print(proxy_request.path)
+                proxy_request.path =\
+                    proxy_request.path.replace(f'/{location}',
+                                               (path if path else '') +
+                                               ('/' if not location else ''),
+                                               1)
                 return proxy_request
         return None

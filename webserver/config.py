@@ -5,20 +5,26 @@ from dataclasses import dataclass, field
 
 def get_abs_path(path: str) -> str:
     """
-    Get absolute path from relative path to this file. If it is absolute, it remains the same.
+    Get absolute path from relative path to this file.
+    If it is absolute, it remains the same.
     """
-    return f'{os.path.dirname(__file__)}{os.path.sep}{path}' if not os.path.isabs(path) else path
+    return f'{os.path.dirname(__file__)}{os.path.sep}{path}'\
+        if not os.path.isabs(path) else path
 
 
 @dataclass
 class Config:
     """
-    Config settings.
+    Config settings for webserver.
+
+    Attributes: # noqa
+        fds (fd) =fds
     All the paths should not start and end with slash and dot characters.
     Root and log paths can be absolute or relative to this file.
-    Proxy_pass is a dictionary containing server directories as keys and proxy server directories as values,
-    '' key proxies the root.
-    If auto_index is True, all the requests ending with the slash character (‘/’) produces a directory listing,
+    Proxy_pass is a dictionary containing server directories as keys
+    and proxy server directories as values, '' key proxies the root.
+    If auto_index is True, all the requests
+    ending with the slash character (‘/’) produces a directory listing,
     which is located in this directory with certain index name.
     """
     hostname: str = 'localhost'
