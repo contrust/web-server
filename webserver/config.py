@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 
 def get_abs_path(path: str) -> str:
     """
-    Return absolute path from relative path to this file. If it is absolute, it remains the same.
+    Get absolute path from relative path to this file. If it is absolute, it remains the same.
     """
     return f'{os.path.dirname(__file__)}{os.path.sep}{path}' if not os.path.isabs(path) else path
 
