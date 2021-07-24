@@ -1,5 +1,5 @@
-from time import time
 from threading import RLock
+from time import time
 
 
 class TimedLruCacheEntry:
@@ -40,7 +40,7 @@ class TimedLruCache:
     def __getitem__(self, item):
         with self.lock:
             try:
-                if item not in self.entries or\
+                if item not in self.entries or \
                         self.entries[item].expiration_time < time():
                     del self.entries[item]
                 self.entries[

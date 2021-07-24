@@ -45,7 +45,7 @@ CODES_DESCRIPTION = {
           'Specified method is invalid for this server.'),
     406: ('Not Acceptable', 'URI not available in preferred format.'),
     407: ('Proxy Authentication Required', 'You must authenticate with '
-          'this proxy before proceeding.'),
+                                           'this proxy before proceeding.'),
     408: ('Request Timeout', 'Request timed out; try again later.'),
     409: ('Conflict', 'Request conflict.'),
     410: ('Gone',

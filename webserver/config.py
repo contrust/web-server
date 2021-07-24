@@ -1,5 +1,5 @@
-import os
 import json
+import os
 from dataclasses import dataclass, field
 
 
@@ -8,7 +8,7 @@ def get_abs_path(path: str) -> str:
     Get absolute path from relative path to this file.
     If it is absolute, it remains the same.
     """
-    return f'{os.path.dirname(__file__)}{os.path.sep}{path}'\
+    return f'{os.path.dirname(__file__)}{os.path.sep}{path}' \
         if not os.path.isabs(path) else path
 
 
@@ -33,7 +33,7 @@ class Config:
     log_file: str = 'log.txt'
     max_threads: int = 5
     proxy_pass: dict = field(default_factory=lambda: {
-        'my': 'localhost:7080/'
+        'dir': 'localhost:7080'
     })
     auto_index: bool = True
     index: str = 'index.html'
