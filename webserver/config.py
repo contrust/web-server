@@ -23,6 +23,9 @@ class Config:
         proxy_pass (dict): dictionary which contains relative to the root paths
         of server directories as keys and paths of proxy directories as values
 
+        python (dict): dictionary which contains relative to the root paths
+        of server directories as keys and python functions names as values
+
         auto_index (bool): if true, for requests which end with '/' server
         gives directory listing as response
 
@@ -49,7 +52,10 @@ class Config:
                 "root": "/home/artem/PycharmProjects/web-server/root",
                 "log_file": "/home/artem/PycharmProjects/web-server/log.txt",
                 "proxy_pass": {
-                    "path": "https://anytask.org/accounts/profile"
+                    "wiki": "https://en.wikipedia.org/wiki/Main_Page"
+                },
+                "python": {
+                    "test": "webserver.function.get_request_information"
                 },
                 "auto_index": True
             }
@@ -70,6 +76,9 @@ class Config:
             self.servers[hostname]['proxy_pass'] = {
                 key.strip('/'): value.strip('/')
                 for key, value in self.servers[hostname]['proxy_pass'].items()}
+            self.servers[hostname]['python'] = {
+                key.strip('/'): value.strip('/')
+                for key, value in self.servers[hostname]['python'].items()}
 
     def load(self, path: str) -> None:
         """
