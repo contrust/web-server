@@ -4,7 +4,7 @@ import re
 from webserver.http_message import Request, Response
 from webserver.log import get_log_message
 
-LOG_MESSAGE_REGEX = re.compile(r'(?P<client>(?:\d{1,3}\.){3}\d{1,3})\s+-\s+-\s+'
+LOG_MESSAGE_REGEX = re.compile(r'(?P<client>(?:\d{1,3}\.){3}\d{1,3}) - - '
                                r'\[(?P<date>\d{2}.\w{3}.\d{4}).*\]\s+"'
                                r'(?P<method>GET|PUT|POST|HEAD|OPTIONS|DELETE)'
                                r'\s+(?P<path>.*?)\s+[A-Z]{3,5}/\d\.\d?"'

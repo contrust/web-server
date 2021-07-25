@@ -7,20 +7,52 @@ from dataclasses import dataclass, field
 class Config:
     """
     Config settings for webserver.
+
+    #Attributes:
+
+        hostname (str): hostname of the server
+
+        port (int): port of the server
+
+        root (str): path to directory which will be root of the server
+
+        log_file (str): path to file which will log requests
+
+        max_threads (int): number of max threads for the server
+
+        proxy_pass (dict): dictionary which contains relative paths of server's
+        directories as keys and paths of proxy directories as values
+
+        auto_index (bool): if true, for requests which end with '/' server
+        gives directory listing as response
+
+        index (str): file which contains directory listing
+
+        keep_alive_timeout (float): time in seconds which client will have
+        after his last request before server closes connection with him
+
+        open_file_cache_size (int): max number of files which can be cached
+        simultaneously in server
+
+        open_file_cache_inactive_time (float): max time which cache object
+        can be inactive, after this time it is removed from cache
+
+        open_file_cache_errors (bool): if true, responses with errors
+        will be also cached
     """
-    hostname: str = ''
-    port: int = 8080
+    hostname: str = 'localhost'
+    port: int = 2020
     root: str = 'root'
     log_file: str = 'log.txt'
     max_threads: int = 5
     proxy_pass: field = field(default_factory=lambda: {
-        'dir': 'localhost:7080'
+        'profile': 'https://anytask.org/accounts/profile'
     })
     auto_index: bool = True
     index: str = 'index.html'
     keep_alive_timeout: float = 5
     open_file_cache_size: int = 5
-    open_file_cache_inactive_time: int = 60
+    open_file_cache_inactive_time: float = 60
     open_file_cache_errors: bool = True
 
     def __post_init__(self):
