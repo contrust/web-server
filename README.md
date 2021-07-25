@@ -40,7 +40,9 @@ python3 -m unittest
 * serve static files / directories with a cache of open files
 * auto-index for catalogs
 * logging requests
+* virtual servers
 * support for keep-alive connections
+* launch of python functions to certain request paths
 * configuration via config file
 * multithreading
 
