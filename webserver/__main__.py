@@ -11,7 +11,7 @@ def parse_arguments():
         prog=None if not globals().get('__spec__')
         else f'python3 -m {__spec__.name.partition(".")[0]}'
     )
-    parser.add_argument('-c', '--config', metavar='CONFIG', required=False,
+    parser.add_argument('-c', '--config', metavar='CONFIG_FILE', required=False,
                         help='run server with config file containing '
                              'dictionary with json format, '
                              'config.py values are used by default '

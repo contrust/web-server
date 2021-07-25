@@ -36,6 +36,7 @@ class Config:
         with open(path) as json_file:
             data = json.load(json_file)
             self.__dict__.update(data)
+            self.__post_init__()
 
     def unload(self, path: str) -> None:
         """
