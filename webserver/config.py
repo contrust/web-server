@@ -1,6 +1,6 @@
 import json
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass
@@ -40,26 +40,36 @@ class Config:
         open_file_cache_errors (bool): if true, responses with errors
         will be also cached
     """
-    hostname: str = 'localhost'
-    port: int = 2020
-    root: str = 'root'
-    log_file: str = 'log.txt'
-    max_threads: int = 5
-    proxy_pass: field = field(default_factory=lambda: {
-        'profile': 'https://anytask.org/accounts/profile'
-    })
-    auto_index: bool = True
-    index: str = 'index.html'
-    keep_alive_timeout: float = 5
-    open_file_cache_size: int = 5
-    open_file_cache_inactive_time: float = 60
-    open_file_cache_errors: bool = True
+
+    def __init__(self):
+        self.hostname = 'localhost'
+        self.port = 2020
+        self.servers = {
+            "localhost": {
+                "root": "/home/artem/PycharmProjects/web-server/root",
+                "log_file": "/home/artem/PycharmProjects/web-server/log.txt",
+                "proxy_pass": {
+                    "path": "https://anytask.org/accounts/profile"
+                },
+                "auto_index": True
+            }
+        }
+        self.max_threads = 5
+        self.index = 'index.html'
+        self.keep_alive_timeout = 5
+        self.open_file_cache_size: int = 5
+        self.open_file_cache_inactive_time: float = 60
+        self.open_file_cache_errors: bool = True
 
     def __post_init__(self):
-        self.root = os.path.abspath(self.root)
-        self.log_file = os.path.abspath(self.log_file)
-        self.proxy_pass = {key.strip('/'): value.strip('/')
-                           for key, value in self.proxy_pass.items()}
+        for hostname in self.servers:
+            self.servers[hostname]['root'] = os.path.abspath(
+                self.servers[hostname]['root'])
+            self.servers[hostname]['log_file'] = os.path.abspath(
+                self.servers[hostname]['log_file'])
+            self.servers[hostname]['proxy_pass'] = {
+                key.strip('/'): value.strip('/')
+                for key, value in self.servers[hostname]['proxy_pass'].items()}
 
     def load(self, path: str) -> None:
         """
