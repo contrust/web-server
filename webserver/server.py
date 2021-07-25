@@ -1,7 +1,7 @@
 import concurrent.futures
 import logging
 import os
-import time
+from timeit import default_timer as timer
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 
 from webserver.config import Config
@@ -35,7 +35,7 @@ class Server:
 
     def handle_client(self, client: socket) -> None:
         while 1:
-            start_time = time.time()
+            start_time = timer()
             raw_request = receive_all(client,
                                       self.config.keep_alive_timeout)
             if not raw_request:
@@ -43,8 +43,9 @@ class Server:
             request = Request().parse(raw_request)
             response = self.get_response(request)
             client.sendall(bytes(response))
+            end_time = timer()
             logging.info(get_log_message(client.getpeername()[0], request,
-                                         response, time.time() - start_time))
+                                         response, end_time - start_time))
             if ('Connection' not in request.headers or
                     request.headers['Connection'] != 'keep-alive'):
                 break
