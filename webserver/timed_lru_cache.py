@@ -3,20 +3,12 @@ from time import time
 
 
 class TimedLruCacheEntry:
-    """
-    Cache entry with expiration time.
-    """
-
     def __init__(self, value, expiration_time: float):
         self.value = value
         self.expiration_time = time() + expiration_time
 
 
 class TimedLruCache:
-    """
-    Cache which deletes its' entry when it wasn't used for a certain time.
-    """
-
     def __init__(self, maxsize, expiration_time):
         self.entries = {}
         self.maxsize = maxsize
@@ -25,9 +17,7 @@ class TimedLruCache:
 
     def __setitem__(self, key, value):
         with self.lock:
-            self.entries = {k: v for k, v in self.entries.items()
-                            if v.expiration_time > time()}
-            if key not in self.entries:
+            if key not in self:
                 if len(self.entries) >= self.maxsize:
                     del self.entries[next(iter(self.entries.keys()))]
                 self.entries[key] = TimedLruCacheEntry(value,
@@ -39,15 +29,19 @@ class TimedLruCache:
 
     def __getitem__(self, item):
         with self.lock:
-            try:
-                if item not in self.entries or \
-                        self.entries[item].expiration_time < time():
-                    del self.entries[item]
-                self.entries[
-                    item].expiration_time = time() + self.expiration_time
+            if item in self:
+                self.entries[item]\
+                    .expiration_time = time() + self.expiration_time
                 return self.entries[item].value
-            except KeyError:
+            else:
                 return None
 
     def __contains__(self, item):
-        return item in self.entries
+        with self.lock:
+            self.update()
+            return item in self.entries
+
+    def update(self):
+        with self.lock:
+            self.entries = {k: v for k, v in self.entries.items()
+                            if v.expiration_time > time()}
