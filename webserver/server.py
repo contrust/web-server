@@ -31,7 +31,7 @@ class Server:
                 server.bind((self.config.hostname, self.config.port))
                 server.listen()
                 print(f'Server launched with '
-                      f'{self.config.hostname}:{self.config.port} address')
+                      f'{self.config.hostname}:{self.config.port}')
                 while 1:
                     client, address = server.accept()
                     executor.submit(self.handle_client, client=client)
@@ -50,8 +50,13 @@ class Server:
             response = self.get_response(request)
             client.sendall(bytes(response))
             end_time = timer()
-            logging.info(get_log_message(client.getpeername()[0], request,
-                                         response, end_time - start_time))
+            if (hostname := request.host[0]) in self.config.servers:
+                logging.basicConfig(
+                    filename=self.config.servers[hostname]['log_file'],
+                    level=logging.DEBUG,
+                    format='%(message)s')
+                logging.info(get_log_message(client.getpeername()[0], request,
+                                             response, end_time - start_time))
             if ('Connection' not in request.headers or
                     request.headers['Connection'] != 'keep-alive'):
                 break
@@ -62,21 +67,25 @@ class Server:
         """
         Get server's response to request.
         """
+        if cache := self.cache[request.path]:
+            return cache
         hostname = request.host[0]
-        logging.basicConfig(filename=self.config.servers[hostname]['log_file'],
-                            level=logging.DEBUG,
-                            format='%(message)s')
-        if (function_response := try_get_function_response(
-                request,
-                self.config.servers[hostname]['python'])):
-            return function_response
-        elif (proxy_request := try_get_proxy_request(
-                request,
-                self.config.servers[hostname]['proxy_pass'])):
-            return get_proxy_response(proxy_request,
-                                      self.config.keep_alive_timeout)
-        else:
-            return self.get_local_response(request)
+        response = Response(code=404)
+        if hostname in self.config.servers:
+            if (function_response := try_get_function_response(
+                    request,
+                    self.config.servers[hostname]['python'])):
+                response = function_response
+            elif (proxy_request := try_get_proxy_request(
+                    request,
+                    self.config.servers[hostname]['proxy_pass'])):
+                response = get_proxy_response(proxy_request,
+                                              self.config.keep_alive_timeout)
+            else:
+                response = self.get_local_response(request)
+        if not response.is_error() or self.config.open_file_cache_errors:
+            self.cache[request.path] = response
+        return response
 
     def get_local_response(self, request: Request) -> Response:
         hostname = request.host[0]
@@ -85,20 +94,10 @@ class Server:
         if (self.config.servers[hostname]['auto_index'] and
                 absolute_path[-1] == os.path.sep):
             absolute_path += self.config.index
-        if cached_value := self.cache[absolute_path]:
-            return cached_value
-        else:
-            try:
-                if os.path.basename(absolute_path) == self.config.index:
-                    make_index(absolute_path,
-                               self.config.servers[hostname]['root'])
-                with open(absolute_path, mode='rb') as file:
-                    response = Response(body=file.read())
-                    if not (os.path.basename(absolute_path) ==
-                            self.config.index):
-                        self.cache[absolute_path] = response
-            except IOError:
-                response = Response(code=404)
-                if self.config.open_file_cache_errors:
-                    self.cache[absolute_path] = response
-            return response
+            make_index(absolute_path,
+                       self.config.servers[hostname]['root'])
+        try:
+            with open(absolute_path, mode='rb') as file:
+                return Response(body=file.read())
+        except IOError:
+            return Response(code=404)
