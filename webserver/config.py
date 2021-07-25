@@ -55,7 +55,7 @@ class Config:
                     "wiki": "https://en.wikipedia.org/wiki/Main_Page"
                 },
                 "python": {
-                    "test": "webserver.function.get_request_information"
+                    "info": "webserver.function.get_request_information"
                 },
                 "auto_index": True
             }

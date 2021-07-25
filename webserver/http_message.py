@@ -170,6 +170,9 @@ class Response(HttpMessage):
         super().__init__(line, headers, body)
         self.headers.update({'Content-Length': str(len(body))})
 
+    def is_error(self) -> bool:
+        return self.code >= 400
+
     @property
     def code_description(self):
         return CODES_DESCRIPTION[self.code][0]
