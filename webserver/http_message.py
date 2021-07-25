@@ -80,6 +80,9 @@ HOST_REGEX = re.compile(
 
 
 class HttpMessage:
+    """
+    HTTP message with parameters.
+    """
     def __init__(self,
                  line: str = '',
                  headers: dict = None,

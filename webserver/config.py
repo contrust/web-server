@@ -18,7 +18,7 @@ class Config:
 
         log_file (str): path to file which will log requests
 
-        max_threads (int): number of max threads for the server
+        max_threads (int): max number of threads for the server
 
         proxy_pass (dict): dictionary which contains relative to the root paths
         of server directories as keys and paths of proxy directories as values
@@ -26,7 +26,7 @@ class Config:
         auto_index (bool): if true, for requests which end with '/' server
         gives directory listing as response
 
-        index (str): file which contains directory listing
+        index (str): file which contains directory listing in this directory
 
         keep_alive_timeout (float): time in seconds which client will have
         after his last request before server closes connection with him
@@ -34,8 +34,8 @@ class Config:
         open_file_cache_size (int): max number of files which can be cached
         simultaneously in server
 
-        open_file_cache_inactive_time (float): max time which cache object
-        can be inactive, after this time it is removed from cache
+        open_file_cache_inactive_time (float): max time in seconds which cache
+        object can be inactive, after this time it is removed from cache
 
         open_file_cache_errors (bool): if true, responses with errors
         will be also cached
