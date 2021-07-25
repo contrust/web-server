@@ -67,8 +67,6 @@ class Server:
         """
         Get server's response to request.
         """
-        if cache := self.cache[request.path]:
-            return cache
         hostname = request.host[0]
         response = Response(code=404)
         if hostname in self.config.servers:
@@ -83,21 +81,27 @@ class Server:
                                               self.config.keep_alive_timeout)
             else:
                 response = self.get_local_response(request)
-        if not response.is_error() or self.config.open_file_cache_errors:
-            self.cache[request.path] = response
         return response
 
     def get_local_response(self, request: Request) -> Response:
+        if response := self.cache[request.path]:
+            return response
+        cached = True
         hostname = request.host[0]
         absolute_path = f'{self.config.servers[hostname]["root"]}' \
                         f'{request.path.replace("/", os.path.sep)}'
         if (self.config.servers[hostname]['auto_index'] and
                 absolute_path[-1] == os.path.sep):
+            cached = False
             absolute_path += self.config.index
             make_index(absolute_path,
                        self.config.servers[hostname]['root'])
         try:
             with open(absolute_path, mode='rb') as file:
-                return Response(body=file.read())
+                response = Response(body=file.read())
         except IOError:
-            return Response(code=404)
+            response = Response(code=404)
+        if ((not response.is_error() or
+             self.config.open_file_cache_errors) and cached):
+            self.cache[request.path] = response
+        return response
