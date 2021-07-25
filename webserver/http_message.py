@@ -104,7 +104,7 @@ class HttpMessage:
 
     @property
     def host(self) -> tuple:
-        match = HOST_REGEX.match(self.headers.get('Host', ''))
+        match = HOST_REGEX.match(self.headers.get('Host', ' '))
         hostname = match.group('hostname')
         port = int(port) if (port := match.group('port')) else 80
         return tuple([hostname, port])

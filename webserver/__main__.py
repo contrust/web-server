@@ -17,11 +17,7 @@ def parse_arguments():
                              'config.py values are used by default '
                              'if they are not mentioned in this file')
     parser.add_argument('--get-config', metavar='OUTPUT_FILE', required=False,
-                        help='get config file with default values '
-                             'in current directory and exit')
-    parser.add_argument('--doc', required=False,
-                        help='get config docs in console and exit',
-                        action='store_true')
+                        help='get config file with default values and exit')
     return parser.parse_args()
 
 
@@ -29,9 +25,6 @@ def main():
     try:
         config = Config()
         args_dict = vars(parse_arguments())
-        if args_dict['doc']:
-            print(help(Config))
-            sys.exit()
         if args_dict['get_config']:
             config.unload(args_dict['get_config'])
             sys.exit()
