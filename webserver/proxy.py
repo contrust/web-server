@@ -8,6 +8,9 @@ PROXY_REGEX = re.compile(r'(https?://)?(www\.)?(?P<host>[^/]*)(?P<path>/.*)?')
 
 def try_get_proxy_request(request: Request, proxy_pass: dict) \
         -> Request or None:
+    """
+    Try to proxy request and return it, otherwise return None.
+    """
     for location in proxy_pass:
         if request.path.startswith(f'/{location}/') or not location:
             proxy_request = copy.deepcopy(request)

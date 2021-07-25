@@ -2,6 +2,9 @@ from select import select
 
 
 def receive_all(sock, timeout) -> bytes:
+    """
+    Receive all the data from socket.
+    """
     total_data = []
     sock.setblocking(0)
     ready = select([sock], [], [], timeout)

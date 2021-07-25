@@ -89,6 +89,9 @@ class HttpMessage:
         self.body = body
 
     def parse(self, message: bytes):
+        """
+        Get instance of parsed http message.
+        """
         match = HTTP_MESSAGE_REGEX.match(message)
         if match:
             self.line = match.group('line').decode('utf-8')
@@ -104,18 +107,27 @@ class HttpMessage:
 
     @property
     def host(self) -> tuple:
+        """
+        Get tuple with hostname and port.
+        """
         match = HOST_REGEX.match(self.headers.get('Host', ' '))
         hostname = match.group('hostname')
         port = int(port) if (port := match.group('port')) else 80
         return tuple([hostname, port])
 
     def __bytes__(self) -> bytes:
+        """
+        Get byte representation.
+        """
         return (self.line.encode('utf-8') + b'\r\n' +
                 b''.join(map(lambda x: f'{x[0]}: {x[1]}\r\n'.encode('utf-8'),
                              self.headers.items())) + b'\r\n' + self.body)
 
 
 class Request(HttpMessage):
+    """
+    Http request with parameters.
+    """
     def __init__(self,
                  method: str = 'GET',
                  path: str = '/',
@@ -140,6 +152,9 @@ class Request(HttpMessage):
 
 
 class Response(HttpMessage):
+    """
+    Http response with parameters.
+    """
     def __init__(self,
                  version: str = 'HTTP/1.1',
                  code: int = 200,

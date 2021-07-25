@@ -9,6 +9,10 @@ class TimedLruCacheEntry:
 
 
 class TimedLruCache:
+    """
+    Lru cache which removes it's items when
+    they haven't been used for a certain time.
+    """
     def __init__(self, maxsize, expiration_time):
         self.entries = {}
         self.maxsize = maxsize

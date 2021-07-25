@@ -2,6 +2,9 @@ import os
 
 
 def make_index(index_path: str, root: str) -> None:
+    """
+    Create html file with directory listing.
+    """
     index_path = os.path.normpath(index_path)
     index = get_path_last_element(index_path)
     directory_path = get_dir_from_path(index_path)

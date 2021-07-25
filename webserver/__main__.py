@@ -7,6 +7,9 @@ from webserver.server import Server
 
 
 def parse_arguments():
+    """
+    Parse console arguments.
+    """
     parser = argparse.ArgumentParser(
         prog=None if not globals().get('__spec__')
         else f'python3 -m {__spec__.name.partition(".")[0]}'
@@ -27,6 +30,9 @@ def parse_arguments():
 
 
 def main():
+    """
+    Process parsed console arguments and run server.
+    """
     try:
         config = Config()
         args_dict = vars(parse_arguments())
