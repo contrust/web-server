@@ -28,9 +28,14 @@ class TestTimedLruCache(unittest.TestCase):
     def test_removing_object_after_expiration_time(self):
         cache = TimedLruCache(maxsize=1, expiration_time=0.05)
         cache['cat'] = 'dog'
-        self.assertIsNotNone(cache['cat'])
+        self.assertIn('cat', cache)
         time.sleep(0.05)
-        self.assertIsNone(cache['cat'])
+        self.assertNotIn('cat', cache)
+
+    def test_value_is_the_same_after_assigment(self):
+        cache = TimedLruCache(maxsize=1, expiration_time=20)
+        cache['zombie'] = 'human'
+        self.assertEqual(cache['zombie'], 'human')
 
 
 if __name__ == '__main__':
