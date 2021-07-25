@@ -90,13 +90,13 @@ class Server:
         hostname = request.host[0]
         absolute_path = f'{self.config.servers[hostname]["root"]}' \
                         f'{request.path.replace("/", os.path.sep)}'
-        if (self.config.servers[hostname]['auto_index'] and
-                absolute_path[-1] == os.path.sep):
-            cached = False
-            absolute_path += self.config.index
-            make_index(absolute_path,
-                       self.config.servers[hostname]['root'])
         try:
+            if (self.config.servers[hostname]['auto_index'] and
+                    absolute_path[-1] == os.path.sep):
+                cached = False
+                absolute_path += self.config.index
+                make_index(absolute_path,
+                           self.config.servers[hostname]['root'])
             with open(absolute_path, mode='rb') as file:
                 response = Response(body=file.read())
         except IOError:
