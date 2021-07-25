@@ -23,6 +23,9 @@ class Server:
                             format='%(message)s')
 
     def run(self) -> None:
+        """
+        Run loop of accepting new connection to the server.
+        """
         with concurrent.futures.ThreadPoolExecutor(
                 max_workers=self.config.max_threads) as executor:
             with socket(AF_INET, SOCK_STREAM) as server:
@@ -34,6 +37,9 @@ class Server:
                     executor.submit(self.handle_client, client=client)
 
     def handle_client(self, client: socket) -> None:
+        """
+        Run loop of giving responses to client's requests.
+        """
         while 1:
             start_time = timer()
             raw_request = receive_all(client,
@@ -53,6 +59,9 @@ class Server:
 
     def get_response(self, request: Request) \
             -> Response:
+        """
+        Get server's response to request.
+        """
         if (proxy_request := try_get_proxy_request(request,
                                                    self.config.proxy_pass)):
             proxy = socket(AF_INET, SOCK_STREAM)

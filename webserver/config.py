@@ -20,8 +20,8 @@ class Config:
 
         max_threads (int): number of max threads for the server
 
-        proxy_pass (dict): dictionary which contains relative paths of server's
-        directories as keys and paths of proxy directories as values
+        proxy_pass (dict): dictionary which contains relative to the root paths
+        of server directories as keys and paths of proxy directories as values
 
         auto_index (bool): if true, for requests which end with '/' server
         gives directory listing as response
@@ -63,7 +63,8 @@ class Config:
 
     def load(self, path: str) -> None:
         """
-        Update config settings from dictionary with json format in the file.
+        Update config settings from the file
+        containing dictionary with json format.
         """
         with open(path) as json_file:
             data = json.load(json_file)
