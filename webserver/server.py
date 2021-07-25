@@ -5,10 +5,11 @@ from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 from timeit import default_timer as timer
 
 from webserver.config import Config
+from webserver.function import try_get_function_response
 from webserver.http_message import Request, Response
 from webserver.index import make_index
 from webserver.log import get_log_message
-from webserver.proxy import try_get_proxy_request
+from webserver.proxy import try_get_proxy_request, get_proxy_response
 from webserver.socket_extensions import receive_all
 from webserver.timed_lru_cache import TimedLruCache
 
@@ -29,6 +30,8 @@ class Server:
                 server.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
                 server.bind((self.config.hostname, self.config.port))
                 server.listen()
+                print(f'Server launched with '
+                      f'{self.config.hostname}:{self.config.port} address')
                 while 1:
                     client, address = server.accept()
                     executor.submit(self.handle_client, client=client)
@@ -63,38 +66,39 @@ class Server:
         logging.basicConfig(filename=self.config.servers[hostname]['log_file'],
                             level=logging.DEBUG,
                             format='%(message)s')
-        if (proxy_request := try_get_proxy_request(request,
-                                                   self.config.servers[
-                                                       hostname][
-                                                       'proxy_pass'])):
-            proxy = socket(AF_INET, SOCK_STREAM)
-            proxy.connect(proxy_request.host)
-            proxy.sendall(bytes(proxy_request))
-            raw_proxy_response = receive_all(proxy,
-                                             self.config.keep_alive_timeout)
-            proxy_response = Response().parse(raw_proxy_response)
-            proxy.close()
-            return proxy_response
+        if (function_response := try_get_function_response(
+                request,
+                self.config.servers[hostname]['python'])):
+            return function_response
+        elif (proxy_request := try_get_proxy_request(
+                request,
+                self.config.servers[hostname]['proxy_pass'])):
+            return get_proxy_response(proxy_request,
+                                      self.config.keep_alive_timeout)
         else:
-            absolute_path = f'{self.config.servers[hostname]["root"]}' \
-                            f'{request.path.replace("/", os.path.sep)}'
-            if (self.config.servers[hostname]['auto_index'] and
-                    absolute_path[-1] == os.path.sep):
-                absolute_path += self.config.index
-            if cached_value := self.cache[absolute_path]:
-                return cached_value
-            else:
-                try:
-                    if os.path.basename(absolute_path) == self.config.index:
-                        make_index(absolute_path,
-                                   self.config.servers[hostname]['root'])
-                    with open(absolute_path, mode='rb') as file:
-                        response = Response(body=file.read())
-                        if not (os.path.basename(absolute_path) ==
-                                self.config.index):
-                            self.cache[absolute_path] = response
-                except IOError:
-                    response = Response(code=404)
-                    if self.config.open_file_cache_errors:
+            return self.get_local_response(request)
+
+    def get_local_response(self, request: Request) -> Response:
+        hostname = request.host[0]
+        absolute_path = f'{self.config.servers[hostname]["root"]}' \
+                        f'{request.path.replace("/", os.path.sep)}'
+        if (self.config.servers[hostname]['auto_index'] and
+                absolute_path[-1] == os.path.sep):
+            absolute_path += self.config.index
+        if cached_value := self.cache[absolute_path]:
+            return cached_value
+        else:
+            try:
+                if os.path.basename(absolute_path) == self.config.index:
+                    make_index(absolute_path,
+                               self.config.servers[hostname]['root'])
+                with open(absolute_path, mode='rb') as file:
+                    response = Response(body=file.read())
+                    if not (os.path.basename(absolute_path) ==
+                            self.config.index):
                         self.cache[absolute_path] = response
-                return response
+            except IOError:
+                response = Response(code=404)
+                if self.config.open_file_cache_errors:
+                    self.cache[absolute_path] = response
+            return response

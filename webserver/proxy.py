@@ -1,7 +1,9 @@
 import copy
 import re
+from socket import socket, AF_INET, SOCK_STREAM
 
-from webserver.http_message import Request
+from webserver.http_message import Request, Response
+from webserver.socket_extensions import receive_all
 
 PROXY_REGEX = re.compile(r'(https?://)?(www\.)?(?P<host>[^/]*)(?P<path>/.*)?')
 
@@ -25,3 +27,13 @@ def try_get_proxy_request(request: Request, proxy_pass: dict) \
                                            1)
             return proxy_request
     return None
+
+
+def get_proxy_response(proxy_request: Request, timeout: float) -> Response:
+    proxy = socket(AF_INET, SOCK_STREAM)
+    proxy.connect(proxy_request.host)
+    proxy.sendall(bytes(proxy_request))
+    raw_proxy_response = receive_all(proxy, timeout)
+    proxy_response = Response().parse(raw_proxy_response)
+    proxy.close()
+    return proxy_response
