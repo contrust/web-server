@@ -17,16 +17,16 @@ Show help
 python3 -m webserver -h
 ```
 
+Get config file with default values
+
+```sh
+python3 -m webserver --get-config output_file
+```
+
 Run server with config file
 
 ```sh
-python3 -m webserver -c path/to/config
-```
-
-Get config file with default values in current directory
-
-```sh
-python3 -m webserver --get-config config_name
+python3 -m webserver -c config_file
 ```
 
 ## Run tests
