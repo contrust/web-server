@@ -1,14 +1,14 @@
 import concurrent.futures
 import logging
 import os
-from timeit import default_timer as timer
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
+from timeit import default_timer as timer
 
 from webserver.config import Config
+from webserver.http_message import Request, Response
 from webserver.index import make_index
 from webserver.log import get_log_message
 from webserver.proxy import try_get_proxy_request
-from webserver.http_message import Request, Response
 from webserver.socket_extensions import receive_all
 from webserver.timed_lru_cache import TimedLruCache
 
@@ -18,9 +18,6 @@ class Server:
         self.config = config
         self.cache = TimedLruCache(config.open_file_cache_size,
                                    config.open_file_cache_inactive_time)
-        logging.basicConfig(filename=config.log_file,
-                            level=logging.DEBUG,
-                            format='%(message)s')
 
     def run(self) -> None:
         """
@@ -62,26 +59,35 @@ class Server:
         """
         Get server's response to request.
         """
+        hostname = request.host[0]
+        logging.basicConfig(filename=self.config.servers[hostname]['log_file'],
+                            level=logging.DEBUG,
+                            format='%(message)s')
         if (proxy_request := try_get_proxy_request(request,
-                                                   self.config.proxy_pass)):
+                                                   self.config.servers[
+                                                       hostname][
+                                                       'proxy_pass'])):
             proxy = socket(AF_INET, SOCK_STREAM)
             proxy.connect(proxy_request.host)
             proxy.sendall(bytes(proxy_request))
             raw_proxy_response = receive_all(proxy,
                                              self.config.keep_alive_timeout)
             proxy_response = Response().parse(raw_proxy_response)
+            proxy.close()
             return proxy_response
         else:
-            absolute_path = f'{self.config.root}' \
+            absolute_path = f'{self.config.servers[hostname]["root"]}' \
                             f'{request.path.replace("/", os.path.sep)}'
-            if self.config.auto_index and absolute_path[-1] == os.path.sep:
+            if (self.config.servers[hostname]['auto_index'] and
+                    absolute_path[-1] == os.path.sep):
                 absolute_path += self.config.index
             if cached_value := self.cache[absolute_path]:
                 return cached_value
             else:
                 try:
                     if os.path.basename(absolute_path) == self.config.index:
-                        make_index(absolute_path, self.config.root)
+                        make_index(absolute_path,
+                                   self.config.servers[hostname]['root'])
                     with open(absolute_path, mode='rb') as file:
                         response = Response(body=file.read())
                         if not (os.path.basename(absolute_path) ==
