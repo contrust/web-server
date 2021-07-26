@@ -18,7 +18,7 @@ def parse_arguments():
                         metavar='CONFIG_FILE',
                         required=False,
                         help='run server with settings in config file')
-    parser.add_argument('--get-config',
+    parser.add_argument('-g', '--get-config',
                         metavar='OUTPUT_FILE',
                         required=False,
                         help='get config file with default values and exit')
