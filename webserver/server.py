@@ -50,7 +50,10 @@ class Server:
             response = self.get_response(request)
             client.sendall(bytes(response))
             end_time = timer()
-            if (hostname := request.host[0]) in self.config.servers:
+            if (hostname := request.headers.get('Host',
+                                                ' ')) in self.config.servers:
+                for handler in logging.root.handlers[:]:
+                    logging.root.removeHandler(handler)
                 logging.basicConfig(
                     filename=self.config.servers[hostname]['log_file'],
                     level=logging.DEBUG,
@@ -67,7 +70,7 @@ class Server:
         """
         Get server's response to request.
         """
-        hostname = request.host[0]
+        hostname = request.headers.get('Host', ' ')
         if hostname in self.config.servers:
             if (function_response := try_get_function_response(
                     request,
@@ -88,7 +91,7 @@ class Server:
         if response := self.cache[request.path]:
             return response
         cached = True
-        hostname = request.host[0]
+        hostname = request.headers.get('Host', ' ')
         absolute_path = f'{self.config.servers[hostname]["root"]}' \
                         f'{request.path.replace("/", os.path.sep)}'
         try:

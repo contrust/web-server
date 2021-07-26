@@ -48,7 +48,7 @@ class Config:
         self.hostname = 'localhost'
         self.port = 2020
         self.servers = {
-            "localhost": {
+            "localhost:2020": {
                 "root": "/home/artem/PycharmProjects/web-server/root",
                 "log_file": "/home/artem/PycharmProjects/web-server/log.txt",
                 "proxy_pass": {
