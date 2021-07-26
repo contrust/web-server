@@ -10,10 +10,15 @@ def try_get_function_response(request: Request, functions: dict) \
     """
     for location in functions:
         if request.path.startswith(f'/{location}/') or not location:
-            p, m = functions[location].rsplit('.', 1)
-            mod = import_module(p)
-            met = getattr(mod, m)
-            return met(request)
+            try:
+                p, m = functions[location].rsplit('.', 1)
+                mod = import_module(p)
+                met = getattr(mod, m)
+                response = met(request)
+            except (ValueError, ModuleNotFoundError, AttributeError):
+                response = Response(code=404)
+            finally:
+                return response
     return None
 
 
