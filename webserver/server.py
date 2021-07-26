@@ -68,7 +68,6 @@ class Server:
         Get server's response to request.
         """
         hostname = request.host[0]
-        response = Response(code=404)
         if hostname in self.config.servers:
             if (function_response := try_get_function_response(
                     request,
@@ -81,6 +80,8 @@ class Server:
                                               self.config.keep_alive_timeout)
             else:
                 response = self.get_local_response(request)
+        else:
+            response = Response(code=404)
         return response
 
     def get_local_response(self, request: Request) -> Response:
