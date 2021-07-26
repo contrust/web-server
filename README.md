@@ -20,7 +20,7 @@ python3 -m webserver -h
 Get config file with default values
 
 ```sh
-python3 -m webserver --get-config output_file
+python3 -m webserver -g output_file
 ```
 
 Run server with config file
