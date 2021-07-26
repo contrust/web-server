@@ -87,24 +87,23 @@ class Server:
         return response
 
     def get_local_response(self, request: Request) -> Response:
-        if response := self.cache[request.path]:
-            return response
-        cached = True
         hostname = request.headers.get('Host', ' ')
         absolute_path = f'{self.config.servers[hostname]["root"]}' \
                         f'{request.path.replace("/", os.path.sep)}'
         try:
             if (self.config.servers[hostname]['auto_index'] and
                     absolute_path[-1] == os.path.sep):
-                cached = False
                 absolute_path += self.config.index
                 make_index(absolute_path,
                            self.config.servers[hostname]['root'])
+            if response := self.cache[absolute_path]:
+                return response
             with open(absolute_path, mode='rb') as file:
                 response = Response(body=file.read())
         except IOError:
             response = Response(code=404)
         if ((not response.is_error() or
-             self.config.open_file_cache_errors) and cached):
-            self.cache[request.path] = response
+             self.config.open_file_cache_errors) and
+                os.path.basename(absolute_path) != self.config.index):
+            self.cache[absolute_path] = response
         return response
