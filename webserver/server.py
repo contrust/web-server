@@ -9,7 +9,7 @@ from webserver.function import try_get_function_response
 from webserver.http_message import Request, Response
 from webserver.index import make_index
 from webserver.log import get_log_message
-from webserver.proxy import try_get_proxy_request, get_proxy_response
+from webserver.proxy import try_get_proxy_response
 from webserver.socket_extensions import receive_all
 from webserver.timed_lru_cache import TimedLruCache
 
@@ -75,11 +75,11 @@ class Server:
                     request,
                     self.config.servers[hostname]['python'])):
                 response = function_response
-            elif (proxy_request := try_get_proxy_request(
+            elif (proxy_response := try_get_proxy_response(
                     request,
-                    self.config.servers[hostname]['proxy_pass'])):
-                response = get_proxy_response(proxy_request,
-                                              self.config.keep_alive_timeout)
+                    self.config.servers[hostname]['proxy_pass'],
+                    self.config.keep_alive_timeout)):
+                response = proxy_response
             else:
                 response = self.get_local_response(request)
         else:

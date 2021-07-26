@@ -4,7 +4,7 @@ from webserver.http_message import Request, Response
 
 
 def try_get_function_response(request: Request, functions: dict) \
-        -> Request or None:
+        -> Response or None:
     """
     Try to get response from python function, otherwise return None.
     """
@@ -14,11 +14,9 @@ def try_get_function_response(request: Request, functions: dict) \
                 p, m = functions[location].rsplit('.', 1)
                 mod = import_module(p)
                 met = getattr(mod, m)
-                response = met(request)
+                return met(request)
             except (ValueError, ModuleNotFoundError, AttributeError):
-                response = Response(code=404)
-            finally:
-                return response
+                return Response(code=404)
     return None
 
 

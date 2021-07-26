@@ -8,8 +8,9 @@ from webserver.socket_extensions import receive_all
 PROXY_REGEX = re.compile(r'(https?://)?(www\.)?(?P<host>[^/]*)(?P<path>/.*)?')
 
 
-def try_get_proxy_request(request: Request, proxy_pass: dict) \
-        -> Request or None:
+def try_get_proxy_response(request: Request,
+                           proxy_pass: dict,
+                           timeout: float) -> Response or None:
     """
     Try to proxy request and return it, otherwise return None.
     """
@@ -25,20 +26,16 @@ def try_get_proxy_request(request: Request, proxy_pass: dict) \
                                            (path if path else '') +
                                            ('/' if not location else ''),
                                            1)
-            return proxy_request
+            proxy = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            proxy.settimeout(5)
+            try:
+                proxy.connect(proxy_request.host)
+                proxy.sendall(bytes(proxy_request))
+                raw_proxy_response = receive_all(proxy, timeout)
+                response = Response().parse(raw_proxy_response)
+            except socket.error:
+                response = Response(code=404)
+            finally:
+                proxy.close()
+                return response
     return None
-
-
-def get_proxy_response(proxy_request: Request, timeout: float) -> Response:
-    proxy = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    proxy.settimeout(5)
-    try:
-        proxy.connect(proxy_request.host)
-        proxy.sendall(bytes(proxy_request))
-        raw_proxy_response = receive_all(proxy, timeout)
-        response = Response().parse(raw_proxy_response)
-    except socket.error:
-        response = Response(code=404)
-    finally:
-        proxy.close()
-        return response
