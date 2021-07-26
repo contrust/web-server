@@ -52,12 +52,11 @@ class Server:
             end_time = timer()
             if (hostname := request.headers.get('Host',
                                                 ' ')) in self.config.servers:
-                for handler in logging.root.handlers[:]:
-                    logging.root.removeHandler(handler)
                 logging.basicConfig(
                     filename=self.config.servers[hostname]['log_file'],
                     level=logging.DEBUG,
-                    format='%(message)s')
+                    format='%(message)s',
+                    force=True)
                 logging.info(get_log_message(client.getpeername()[0], request,
                                              response, end_time - start_time))
             if ('Connection' not in request.headers or
