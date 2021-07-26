@@ -90,20 +90,21 @@ class Server:
         hostname = request.headers.get('Host', ' ')
         absolute_path = f'{self.config.servers[hostname]["root"]}' \
                         f'{request.path.replace("/", os.path.sep)}'
+        is_auto_index = (self.config.servers[hostname]['auto_index'] and
+                         absolute_path[-1] == os.path.sep)
         try:
-            if (self.config.servers[hostname]['auto_index'] and
-                    absolute_path[-1] == os.path.sep):
-                absolute_path += self.config.index
-                make_index(absolute_path,
+            if is_auto_index:
+                make_index(absolute_path + self.config.index,
                            self.config.servers[hostname]['root'])
             if response := self.cache[absolute_path]:
                 return response
-            with open(absolute_path, mode='rb') as file:
+            with open(absolute_path +
+                      (self.config.index if is_auto_index else ''),
+                      mode='rb') as file:
                 response = Response(body=file.read())
         except IOError:
             response = Response(code=404)
         if ((not response.is_error() or
-             self.config.open_file_cache_errors) and
-                os.path.basename(absolute_path) != self.config.index):
+             self.config.open_file_cache_errors) and not is_auto_index):
             self.cache[absolute_path] = response
         return response
