@@ -87,7 +87,7 @@ class Server:
         return response
 
     def get_local_response(self, request: Request) -> Response:
-        hostname = request.headers.get('Host', ' ')
+        hostname = request.headers['Host']
         absolute_path = f'{self.config.servers[hostname]["root"]}' \
                         f'{request.path.replace("/", os.path.sep)}'
         is_auto_index = (self.config.servers[hostname]['auto_index'] and
