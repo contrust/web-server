@@ -4,12 +4,13 @@ import os
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 from timeit import default_timer as timer
 
+
 from webserver.config import Config
 from webserver.function import try_get_function_response
 from webserver.http_message import Request, Response
 from webserver.index import make_index
 from webserver.log import get_log_message
-from webserver.proxy import try_get_proxy_response
+from webserver.proxy import try_get_proxy_response_and_send_to_client
 from webserver.socket_extensions import receive_all
 from webserver.timed_lru_cache import TimedLruCache
 
@@ -41,30 +42,50 @@ class Server:
         Run loop of giving responses to client's requests.
         """
         while 1:
-            start_time = timer()
-            raw_request = receive_all(client,
-                                      self.config.keep_alive_timeout)
-            if not raw_request:
-                break
-            request = Request().parse(raw_request)
-            response = self.get_response(request)
-            client.sendall(bytes(response))
-            end_time = timer()
-            if (hostname := request.headers.get('Host',
-                                                ' ')) in self.config.servers:
-                logging.basicConfig(
-                    filename=self.config.servers[hostname]['log_file'],
-                    level=logging.DEBUG,
-                    format='%(message)s',
-                    force=True)
-                logging.info(get_log_message(client.getpeername()[0], request,
-                                             response, end_time - start_time))
-            if ('Connection' not in request.headers or
-                    request.headers['Connection'] != 'keep-alive'):
-                break
+            try:
+                start_time = timer()
+                raw_request = receive_all(client,
+                                          self.config.keep_alive_timeout)
+                if not raw_request:
+                    break
+                try:
+                    request = Request().parse(raw_request)
+                except Exception as e:
+                    print(f"{type(e).__name__} at line "
+                          f"{e.__traceback__.tb_lineno} of {__file__}: {e}")
+                    client.sendall(bytes(Response(code=400)))
+                    continue
+                try:
+                    response = self.get_response(client, request)
+                except Exception as e:
+                    print(f"{type(e).__name__} at line "
+                          f"{e.__traceback__.tb_lineno} of {__file__}: {e}")
+                    response = Response(code=500)
+                end_time = timer()
+                if (hostname :=
+                        request.headers.get('Host',
+                                            ' ')) in self.config.servers:
+                    logging.basicConfig(
+                        filename=self.config.servers[hostname]['log_file'],
+                        level=logging.DEBUG,
+                        format='%(message)s',
+                        force=True)
+                    logging.info(get_log_message(client.getpeername()[0],
+                                                 request,
+                                                 response,
+                                                 end_time - start_time))
+                if ('Connection' not in request.headers or
+                        request.headers['Connection'] != 'keep-alive'):
+                    break
+            except Exception as e:
+                print(
+                    f"{type(e).__name__} at line "
+                    f"{e.__traceback__.tb_lineno} of {__file__}: {e}")
+                client.sendall(bytes(Response(code=500)))
+                continue
         client.close()
 
-    def get_response(self, request: Request) \
+    def get_response(self, client: socket, request: Request) \
             -> Response:
         """
         Get server's response to request.
@@ -75,15 +96,16 @@ class Server:
                     request,
                     self.config.servers[hostname]['python'])):
                 response = function_response
-            elif (proxy_response := try_get_proxy_response(
+            elif (proxy_response := try_get_proxy_response_and_send_to_client(
+                    client,
                     request,
-                    self.config.servers[hostname]['proxy_pass'],
-                    self.config.keep_alive_timeout)):
-                response = proxy_response
+                    self.config.servers)):
+                return proxy_response
             else:
                 response = self.get_local_response(request)
         else:
             response = Response(code=404)
+        client.sendall(bytes(response))
         return response
 
     def get_local_response(self, request: Request) -> Response:

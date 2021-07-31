@@ -48,6 +48,9 @@ def main():
         server.run()
     except KeyboardInterrupt:
         print('\r   ')
+    except Exception as e:
+        print(f"{type(e).__name__} at line"
+              f" {e.__traceback__.tb_lineno} of {__file__}: {e}")
     finally:
         sys.exit()
 

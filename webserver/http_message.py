@@ -105,6 +105,7 @@ class HttpMessage:
                                         .splitlines()))
             if match.group('body'):
                 self.body = match.group('body')
+                self.headers['Content-Length'] = len(self.body)
             return self
         raise ValueError
 
@@ -168,7 +169,7 @@ class Response(HttpMessage):
         self.code = code
         self.code_description = CODES_DESCRIPTION[code][0]
         super().__init__(line, headers, body)
-        self.headers.update({'Content-Length': str(len(body))})
+        self.headers.update({'Content-Length': len(body)})
 
     def is_error(self) -> bool:
         return self.code >= 400
