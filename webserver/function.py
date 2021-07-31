@@ -15,8 +15,10 @@ def try_get_function_response(request: Request, functions: dict) \
                 mod = import_module(p)
                 met = getattr(mod, m)
                 return met(request)
-            except (ValueError, ModuleNotFoundError, AttributeError):
-                return Response(code=404)
+            except (ValueError, ModuleNotFoundError, AttributeError) as e:
+                print(f"{type(e).__name__} at line "
+                      f"{e.__traceback__.tb_lineno} of {__file__}: {e}")
+                return Response(code=500)
     return None
 
 
