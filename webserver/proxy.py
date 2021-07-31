@@ -62,7 +62,6 @@ def try_get_proxy_response_and_send_to_client(client: socket,
                         for sock in output_ready:
                             if sock == client:
                                 if client_data:
-                                    print(client_data)
                                     bytes_written = client.send(client_data)
                                     if response:
                                         response.headers[
