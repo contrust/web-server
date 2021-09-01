@@ -19,8 +19,10 @@ class Server:
         self.config = config
         self.cache = TimedLruCache(config.open_file_cache_size,
                                    config.open_file_cache_inactive_time)
-        for server in self.config.servers:
-            setup_logger(server, self.config.servers[server]['log_file'])
+        server = f'{config.hostname}:{config.port}'
+        self.config.servers[server] = self.config.servers['default']
+        for hostname in self.config.servers:
+            setup_logger(hostname, self.config.servers[hostname]['log_file'])
 
     def run(self) -> None:
         """
@@ -31,7 +33,7 @@ class Server:
             try:
                 server.bind((self.config.hostname, self.config.port))
             except socket.error as e:
-                logging.getLogger('localhost:2020').error(e)
+                logging.getLogger('default').error(e)
                 return
             server.listen()
             print(f'Server launched with '

@@ -48,7 +48,7 @@ class Config:
         self.hostname = 'localhost'
         self.port = 2020
         self.servers = {
-            "localhost:2020": {
+            "default": {
                 "root": "/home/artem/PycharmProjects/web-server/root",
                 "log_file": "/home/artem/PycharmProjects/web-server/log.txt",
                 "proxy_pass": {
@@ -68,6 +68,10 @@ class Config:
         self.open_file_cache_errors: bool = True
 
     def __post_init__(self):
+        for hostname in self.servers:
+            for key in self.servers['default']:
+                if key not in self.servers[hostname]:
+                    self.servers[hostname][key] = self.servers['default'][key]
         for hostname in self.servers:
             self.servers[hostname]['root'] = os.path.abspath(
                 self.servers[hostname]['root'])
