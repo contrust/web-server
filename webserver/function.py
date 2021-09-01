@@ -1,4 +1,5 @@
 from importlib import import_module
+import logging
 
 from webserver.http_message import Request, Response
 
@@ -16,8 +17,7 @@ def try_get_function_response(request: Request, functions: dict) \
                 met = getattr(mod, m)
                 return met(request)
             except (ValueError, ModuleNotFoundError, AttributeError) as e:
-                print(f"{type(e).__name__} at line "
-                      f"{e.__traceback__.tb_lineno} of {__file__}: {e}")
+                logging.getLogger(request.headers['Host']).exception(e)
                 return Response(code=500)
     return None
 
