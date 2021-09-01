@@ -1,7 +1,7 @@
 import concurrent.futures
 import logging
 import os
-from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
+import socket
 from timeit import default_timer as timer
 
 from webserver.config import Config
@@ -26,14 +26,18 @@ class Server:
         """
         Run loop of accepting new connection to the server.
         """
-        with concurrent.futures.ThreadPoolExecutor(
-                max_workers=self.config.max_threads) as executor:
-            with socket(AF_INET, SOCK_STREAM) as server:
-                server.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+            server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            try:
                 server.bind((self.config.hostname, self.config.port))
-                server.listen()
-                print(f'Server launched with '
-                      f'{self.config.hostname}:{self.config.port}')
+            except socket.error as e:
+                logging.getLogger('localhost:2020').error(e)
+                return
+            server.listen()
+            print(f'Server launched with '
+                  f'{self.config.hostname}:{self.config.port}')
+            with concurrent.futures.ThreadPoolExecutor(
+                    max_workers=self.config.max_threads) as executor:
                 while True:
                     client, address = server.accept()
                     executor.submit(self.handle_client, client=client)
