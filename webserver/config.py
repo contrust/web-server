@@ -1,6 +1,7 @@
 import json
 import os
 from dataclasses import dataclass
+from webserver.log import setup_logger
 
 
 @dataclass
@@ -49,8 +50,8 @@ class Config:
         self.port = 2020
         self.servers = {
             "default": {
-                "root": "/home/artem/PycharmProjects/web-server/root",
-                "log_file": "/home/artem/PycharmProjects/web-server/log.txt",
+                "root": "root",
+                "log_file": "log.txt",
                 "proxy_pass": {
                     "wiki": "https://en.wikipedia.org/wiki/Main_Page"
                 },
@@ -66,6 +67,7 @@ class Config:
         self.open_file_cache_size: int = 5
         self.open_file_cache_inactive_time: float = 60
         self.open_file_cache_errors: bool = True
+        self.__post_init__()
 
     def __post_init__(self):
         for hostname in self.servers:
@@ -83,6 +85,10 @@ class Config:
             self.servers[hostname]['python'] = {
                 key.strip('/'): value.strip('/')
                 for key, value in self.servers[hostname]['python'].items()}
+        host = f'{self.hostname}:{self.port}'
+        self.servers[host] = self.servers['default']
+        for hostname in self.servers:
+            setup_logger(hostname, self.servers[hostname]['log_file'])
 
     def load(self, path: str) -> None:
         """
