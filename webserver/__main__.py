@@ -33,17 +33,17 @@ def main():
     """
     Process parsed console arguments and run server.
     """
+    config = Config()
+    args_dict = vars(parse_arguments())
+    if args_dict['config_doc']:
+        print(config.__doc__)
+        sys.exit()
+    if args_dict['get_config']:
+        config.unload(args_dict['get_config'])
+        sys.exit()
+    if args_dict['config']:
+        config.load(args_dict['config'])
     try:
-        config = Config()
-        args_dict = vars(parse_arguments())
-        if args_dict['config_doc']:
-            print(config.__doc__)
-            sys.exit()
-        if args_dict['get_config']:
-            config.unload(args_dict['get_config'])
-            sys.exit()
-        if args_dict['config']:
-            config.load(args_dict['config'])
         server = Server(config)
         server.run()
     except KeyboardInterrupt:
