@@ -15,7 +15,7 @@ def try_get_proxy_request(request: Request,
     Try to get proxy request.
     """
     proxy_pass = {}
-    if request.headers['Host'] in servers:
+    if 'Host' in request.headers and request.headers['Host'] in servers:
         proxy_pass = servers[request.headers['Host']]['proxy_pass']
     for location in proxy_pass:
         if request.path.startswith(f'/{location}/') or not location:

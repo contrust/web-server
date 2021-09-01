@@ -53,8 +53,8 @@ class Server:
             response = self.get_response_and_send_to_client(client, request)
             end_time = timer()
             if (hostname :=
-            request.headers.get('Host',
-                                ' ')) in self.config.servers:
+                request.headers.get('Host',
+                                    ' ')) in self.config.servers:
                 logging.getLogger(hostname).info(
                     get_log_message(client.getpeername()[0],
                                     request,
@@ -76,8 +76,10 @@ class Server:
                     request,
                     self.config.servers[hostname]['python'])):
                 response = function_response
-            elif (proxy_response := try_get_and_send_proxy_response(client, request,
-                                             self.config.servers)):
+            elif (proxy_response :=
+                    try_get_and_send_proxy_response(client,
+                                                    request,
+                                                    self.config.servers)):
                 if not proxy_response.is_error:
                     return proxy_response
                 response = proxy_response
