@@ -67,7 +67,6 @@ class Config:
         self.open_file_cache_size: int = 5
         self.open_file_cache_inactive_time: float = 60
         self.open_file_cache_errors: bool = True
-        self.__post_init__()
 
     def __post_init__(self):
         for hostname in self.servers:

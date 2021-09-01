@@ -63,7 +63,7 @@ def try_get_and_send_proxy_response(client: socket,
         input_ready, output_ready, _ = select([client, proxy],
                                               outputs, [], 5)
 
-        if input_ready or output_ready:
+        if client_data or proxy_data:
             for sock in input_ready:
                 try:
                     data = sock.recv(8192)

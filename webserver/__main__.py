@@ -50,6 +50,7 @@ def main():
         try:
             config.load(args_dict['config'])
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
+            config.__post_init__()
             logging.getLogger('default').exception(e)
             sys.exit()
     try:
