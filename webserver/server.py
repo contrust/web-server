@@ -8,7 +8,7 @@ from webserver.config import Config
 from webserver.function import try_get_function_response
 from webserver.http_message import Request, Response
 from webserver.index import make_index
-from webserver.log import get_log_message, setup_logger
+from webserver.log import get_log_message
 from webserver.proxy import try_get_and_send_proxy_response
 from webserver.socket_extensions import receive_all
 from webserver.timed_lru_cache import TimedLruCache
@@ -19,10 +19,6 @@ class Server:
         self.config = config
         self.cache = TimedLruCache(config.open_file_cache_size,
                                    config.open_file_cache_inactive_time)
-        server = f'{config.hostname}:{config.port}'
-        self.config.servers[server] = self.config.servers['default']
-        for hostname in self.config.servers:
-            setup_logger(hostname, self.config.servers[hostname]['log_file'])
 
     def run(self) -> None:
         """

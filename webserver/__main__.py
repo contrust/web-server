@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import argparse
+import json
+import logging
 import sys
 
 from webserver.config import Config
@@ -39,18 +41,24 @@ def main():
         print(config.__doc__)
         sys.exit()
     if args_dict['get_config']:
-        config.unload(args_dict['get_config'])
+        try:
+            config.unload(args_dict['get_config'])
+        except NotADirectoryError as e:
+            logging.getLogger('default').exception(e)
         sys.exit()
     if args_dict['config']:
-        config.load(args_dict['config'])
+        try:
+            config.load(args_dict['config'])
+        except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
+            logging.getLogger('default').exception(e)
+            sys.exit()
     try:
         server = Server(config)
         server.run()
     except KeyboardInterrupt:
         print('\r   ')
     except Exception as e:
-        print(f"{type(e).__name__} at line"
-              f" {e.__traceback__.tb_lineno} of {__file__}: {e}")
+        logging.getLogger('default').exception(e)
     finally:
         sys.exit()
 
