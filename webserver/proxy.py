@@ -51,62 +51,33 @@ def try_get_and_send_proxy_response(client: socket,
         return Response(code=502)
     client.settimeout(0)
     proxy.settimeout(0)
-    client_data = b''
     proxy_data = bytes(proxy_request)
-    while True:
-        outputs = []
-        if client_data:
-            outputs.append(client)
-        if proxy_data:
-            outputs.append(proxy)
-
-        input_ready, output_ready, _ = select([client, proxy],
-                                              outputs, [], 5)
-
-        if client_data or proxy_data:
-            for sock in input_ready:
+    try:
+        proxy.sendall(proxy_data)
+    except (socket.error, socket.gaierror) as e:
+        logging.getLogger(request.headers['Host']).exception(e)
+        proxy.close()
+        return Response(code=502)
+    ready, _, _ = select([proxy], [], [], 5)
+    while ready:
+        try:
+            data = proxy.recv(8192)
+            if response:
+                response.headers['Content-Length'] += len(data)
+            else:
                 try:
-                    data = sock.recv(8192)
-                except BlockingIOError:
-                    data = b''
-                except socket.error as e:
-                    logging.getLogger(request.headers['Host']).exception(e)
-                    return Response(code=400)
-                if sock == client:
-                    proxy_data += data
-                else:
-                    client_data += data
-
-            for sock in output_ready:
-                if sock == client:
-                    if client_data:
-                        try:
-                            bytes_written = client.send(client_data)
-                        except socket.error as e:
-                            logging.getLogger(
-                                request.headers['Host']).exception(e)
-                            return Response(code=400)
-                        if response:
-                            response.headers[
-                                'Content-Length'] += bytes_written
-                        else:
-                            try:
-                                response = Response().parse(client_data)
-                            except ValueError as e:
-                                logging.getLogger(
-                                    request.headers['Host']).exception(e)
-                                return Response(code=413)
-                        client_data = client_data[bytes_written:]
-
-                elif proxy_data:
-                    try:
-                        bytes_written = proxy.send(proxy_data)
-                    except socket.error as e:
-                        logging.getLogger(
-                            request.headers['Host']).exception(e)
-                        return Response(code=502)
-                    proxy_data = proxy_data[bytes_written:]
-        else:
-            break
-    proxy.close()
-    return response
+                    response = Response().parse(data)
+                except ValueError as e:
+                    logging.getLogger(
+                        request.headers['Host']).exception(e)
+                    return Response(code=413)
+            try:
+                client.sendall(data)
+            except socket.error as e:
+                logging.getLogger(request.headers['Host']).exception(e)
+                return Response(code=400)
+            if not data:
+                break
+        except BlockingIOError:
+            return response
+    return Response(code=408)
