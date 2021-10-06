@@ -23,4 +23,5 @@ def try_get_function_response(request: Request, functions: dict) \
 
 
 def get_request_information(request):
-    return Response(body=bytes(request))
+    response = Response(body=bytes(request))
+    return response

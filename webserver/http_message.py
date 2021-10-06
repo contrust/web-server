@@ -2,7 +2,7 @@ import re
 
 HTTP_MESSAGE_REGEX = re.compile(
     rb'(?P<line>([^\s]+)\s([^\s]+)\s(.*?))\r\n'
-    rb'(?P<headers>(?:.*?: .*?\r\n)*)\r\n'
+    rb'(?P<headers>(?:[^\r\n]+?: .*?\r\n)*)\r\n'
     rb'(?P<body>.*)', re.DOTALL)
 REQUEST_REGEX = re.compile(r'(?P<method>GET|PUT|POST|HEAD|OPTIONS|DELETE) '
                            r'(?P<path>/[^\s]*) '
