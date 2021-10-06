@@ -85,7 +85,6 @@ def test_proxy_request():
     config1.port = 9092
     config1.servers['default']['proxy_pass']['proxy'] = 'localhost:9093'
     config2.port = 9093
-    config2.servers['default']['log_file'] = 'log2.txt'
     t1 = threading.Thread(target=run_server, args=(config1,))
     t2 = threading.Thread(target=run_server, args=(config2,))
     t1.setDaemon(True)
