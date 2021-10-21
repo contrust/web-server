@@ -1,6 +1,8 @@
 import multiprocessing
 import urllib.request
 import pytest
+from pathlib import Path
+import os
 
 from webserver.config import Config
 from webserver.server import Server
@@ -8,6 +10,9 @@ from webserver.server import Server
 
 @pytest.fixture(autouse=True, scope="session")
 def start_servers():
+    abspath = os.path.abspath(__file__)
+    dirname = os.path.dirname(abspath)
+    os.chdir(dirname)
     config = Config()
     config.port = 9080
     config.servers['default']['proxy_pass']['info'] = 'localhost:9090'
@@ -45,7 +50,9 @@ def test_request_to_index_page():
 
 def test_request_to_picture():
     response = get_http_response('http://localhost:9080/test_picture.jpg')
+    picture_content = Path('root/test_picture.jpg').read_bytes()
     assert response.getcode() is 200
+    assert response.read() == picture_content
 
 
 def test_request_to_same_function_and_proxy_path():
