@@ -44,42 +44,42 @@ def get_http_response(url: str):
 def test_request_to_index_page():
     response = get_http_response('http://localhost:9080')
     content = response.read()
-    assert response.getcode() is 200
+    assert response.getcode() == 200
     assert b'Index of /' in content
 
 
 def test_request_to_picture():
     response = get_http_response('http://localhost:9080/test_picture.jpg')
     picture_content = Path('root/test_picture.jpg').read_bytes()
-    assert response.getcode() is 200
+    assert response.getcode() == 200
     assert response.read() == picture_content
 
 
 def test_request_to_same_function_and_proxy_path():
     response = get_http_response('http://localhost:9080/info/')
     content = response.read()
-    assert response.getcode() is 200
+    assert response.getcode() == 200
     assert content.startswith(b'GET /info/ HTTP/1.1')
 
 
 def test_request_to_info():
     response = get_http_response('http://localhost:9080/info/blablabla')
     content = response.read()
-    assert response.getcode() is 200
+    assert response.getcode() == 200
     assert content.startswith(b'GET /info/blablabla HTTP/1.1')
 
 
 def test_request_to_local_page_of_proxy():
     response = get_http_response('http://localhost:9080/proxy/')
     content = response.read()
-    assert response.getcode() is 200
+    assert response.getcode() == 200
     assert b'Index of' in content
 
 
 def test_request_to_info_of_proxy():
     response = get_http_response('http://localhost:9080/proxy/info/')
     content = response.read()
-    assert response.getcode() is 200
+    assert response.getcode() == 200
     assert content.startswith(b'GET /info/ HTTP/1.1')
 
 
@@ -104,5 +104,5 @@ def test_request_to_not_existed_proxy():
 def test_request_to_info_of_proxy_of_proxy():
     response = get_http_response('http://localhost:9080/proxy/proxy/info/')
     content = response.read()
-    assert response.getcode() is 200
+    assert response.getcode() == 200
     assert content.startswith(b'GET /info/ HTTP/1.1')
